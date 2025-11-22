@@ -1,0 +1,88 @@
+Markdown Formatting Checklist
+==============================
+
+DOCUMENT STRUCTURE:
+[ ] Single H1 at the beginning
+[ ] No skipped header levels (H1 → H2 → H3)
+[ ] Logical section hierarchy
+[ ] Single newline at end of file
+
+HEADERS:
+[ ] ATX-style headers (# notation)
+[ ] Blank line before each header (except first)
+[ ] Blank line after each header
+[ ] No trailing punctuation
+[ ] Consistent capitalization
+
+LISTS:
+[ ] Consistent markers (use - for unordered)
+[ ] Proper indentation (2 spaces per level)
+[ ] Blank line before list block
+[ ] Blank line after list block
+[ ] No blank lines between simple items
+
+CODE:
+[ ] Inline code uses single backticks
+[ ] Fenced code blocks (not indented)
+[ ] Language identifier on all code blocks
+[ ] Blank line before code block
+[ ] Blank line after code block
+
+LINKS:
+[ ] Descriptive link text (no "click here")
+[ ] Reference-style for repeated URLs
+[ ] URLs properly encoded
+[ ] Links tested (if applicable)
+
+IMAGES:
+[ ] Descriptive alt text on all images
+[ ] Blank line before image
+[ ] Blank line after image
+[ ] Meaningful alt descriptions
+
+EMPHASIS:
+[ ] Bold uses **double asterisks**
+[ ] Italic uses *single asterisks*
+[ ] Not used for headers
+[ ] Not used for code
+
+TABLES:
+[ ] Headers present
+[ ] Separator row with minimum 3 dashes
+[ ] Columns aligned for readability
+[ ] Blank line before table
+[ ] Blank line after table
+
+SPACING:
+[ ] No trailing whitespace
+[ ] Single blank line between sections
+[ ] Proper spacing around all blocks
+[ ] No multiple consecutive blank lines
+
+BLOCKQUOTES:
+[ ] Space after > marker
+[ ] Blank line before blockquote
+[ ] Blank line after blockquote
+
+HORIZONTAL RULES:
+[ ] Use --- (three dashes)
+[ ] Blank line before rule
+[ ] Blank line after rule
+
+CONSISTENCY:
+[ ] One style used throughout
+[ ] Matches project conventions
+[ ] All sections formatted uniformly
+
+CONTENT QUALITY (Optional):
+[ ] No spelling errors
+[ ] Clear and concise writing
+[ ] Proper grammar
+[ ] Technical accuracy
+
+FINAL CHECKS:
+[ ] File saved with .md extension
+[ ] UTF-8 encoding
+[ ] No merge conflict markers
+[ ] No TODO or FIXME unless intended
+[ ] Renders correctly in preview
