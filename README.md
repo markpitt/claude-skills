@@ -36,6 +36,52 @@ Skills are automatically discovered on the next session.
 
 ## Available Skills
 
+### azure-swa
+
+Comprehensive expertise for Azure Static Web Apps including architecture, configuration, API integration with Azure Functions, authentication, routing, deployment, and CI/CD.
+
+**Use when:**
+- Building new Azure Static Web Apps
+- Configuring SWA with React, Angular, Vue, Blazor, or other frameworks
+- Integrating Azure Functions as serverless APIs
+- Setting up authentication and authorization
+- Configuring custom domains and SSL
+- Troubleshooting deployment or runtime issues
+- Implementing CI/CD with GitHub Actions
+
+**Location:** `skills/azure-swa/`
+
+**Features:**
+- Complete architecture guidance
+- Configuration examples (staticwebapp.config.json)
+- API integration patterns
+- Authentication and authorization setup
+- Deployment and CI/CD workflows
+- Security and performance best practices
+- Comprehensive troubleshooting guide
+
+### blazor-blog-feature
+
+Adds a complete blog feature to an existing Blazor WebAssembly Static Web App with Azure Functions backend and Azure File Share for markdown storage.
+
+**Use when:**
+- Implementing blog functionality in .NET Blazor WASM projects
+- Integrating Azure Storage for content management
+- Building content-driven Blazor applications
+
+**Location:** `skills/blazor-blog-feature/`
+
+### freeagent-api
+
+Interacts with the FreeAgent accounting API to manage invoices, contacts, projects, expenses, timeslips, and other financial data.
+
+**Use when:**
+- Building integrations with FreeAgent accounting system
+- Automating financial workflows
+- Retrieving or analyzing FreeAgent data
+
+**Location:** `skills/freeagent-api/`
+
 ### markdown-formatter
 
 Formats markdown files according to best practices and common style guidelines.
@@ -54,6 +100,17 @@ Formats markdown files according to best practices and common style guidelines.
 - Ensures consistent emphasis markers
 - Validates link text and alt text
 - Includes validation script
+
+### microsoft-graph
+
+Comprehensive skill for working with Microsoft Graph API across all services including users, groups, mail, calendar, files (OneDrive/SharePoint), Teams, security, applications, and more.
+
+**Use when:**
+- Implementing Microsoft Graph API integrations
+- Querying Microsoft 365 data
+- Building applications that interact with Azure AD and Microsoft services
+
+**Location:** `skills/microsoft-graph/`
 
 ## Repository Structure
 
