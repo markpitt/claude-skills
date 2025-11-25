@@ -1,8 +1,8 @@
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
-use anyhow::{Result, Context};
 
 /// Represents a Claude Skill with metadata from SKILL.md
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,12 +54,11 @@ pub fn discover_skills(base_path: &Path) -> Result<Vec<Skill>> {
 
 /// Parses a SKILL.md file and extracts metadata
 fn parse_skill(skill_md_path: &Path, path: PathBuf) -> Result<Skill> {
-    let content = fs::read_to_string(skill_md_path)
-        .context("Failed to read SKILL.md")?;
+    let content = fs::read_to_string(skill_md_path).context("Failed to read SKILL.md")?;
 
     // Extract frontmatter
-    let frontmatter = extract_frontmatter(&content)
-        .context("Failed to extract frontmatter from SKILL.md")?;
+    let frontmatter =
+        extract_frontmatter(&content).context("Failed to extract frontmatter from SKILL.md")?;
 
     Ok(Skill {
         name: frontmatter.name,
@@ -91,8 +90,8 @@ fn extract_frontmatter(content: &str) -> Result<SkillFrontmatter> {
     let frontmatter_str = lines[1..end_index].join("\n");
 
     // Parse YAML frontmatter
-    let frontmatter: SkillFrontmatter = serde_yaml::from_str(&frontmatter_str)
-        .context("Failed to parse YAML frontmatter")?;
+    let frontmatter: SkillFrontmatter =
+        serde_yaml::from_str(&frontmatter_str).context("Failed to parse YAML frontmatter")?;
 
     Ok(frontmatter)
 }

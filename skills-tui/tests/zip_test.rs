@@ -1,5 +1,5 @@
-use std::fs;
 use skills_tui::discover_skills;
+use std::fs;
 
 #[test]
 fn test_zip_skill_creates_valid_archive() {
@@ -57,8 +57,16 @@ version: 1.0
 "#;
 
     fs::write(skill_dir.join("SKILL.md"), skill_md_content).expect("Failed to write SKILL.md");
-    fs::write(skill_dir.join("resources/reference.md"), "Reference material").expect("Failed to write reference");
-    fs::write(skill_dir.join("scripts/setup.sh"), "#!/bin/bash\necho 'setup'").expect("Failed to write script");
+    fs::write(
+        skill_dir.join("resources/reference.md"),
+        "Reference material",
+    )
+    .expect("Failed to write reference");
+    fs::write(
+        skill_dir.join("scripts/setup.sh"),
+        "#!/bin/bash\necho 'setup'",
+    )
+    .expect("Failed to write script");
 
     // Discover the skill
     let skills = discover_skills(temp_path).expect("Failed to discover skills");
@@ -102,7 +110,8 @@ version: 2.0
     assert_eq!(skill.version, Some("2.0".to_string()));
 
     // Verify the content that would be in the archive
-    let skill_md = fs::read_to_string(skill.path.join("SKILL.md")).expect("Failed to read SKILL.md");
+    let skill_md =
+        fs::read_to_string(skill.path.join("SKILL.md")).expect("Failed to read SKILL.md");
     assert!(skill_md.contains("verify-skill"));
     assert!(skill_md.contains("Verify Skill"));
 

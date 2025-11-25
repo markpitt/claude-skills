@@ -48,7 +48,7 @@ jobs:
           echo '<meta http-equiv="refresh" content="0;url=skills_tui/index.html">' > index.html
 
       - name: Upload documentation artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: skills-tui/target/doc/

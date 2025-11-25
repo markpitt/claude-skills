@@ -1,6 +1,6 @@
+use skills_tui::discover_skills;
 use std::fs;
 use std::path::Path;
-use skills_tui::discover_skills;
 
 #[test]
 fn test_discover_skills_finds_all_skills() {
@@ -69,8 +69,7 @@ fn test_discover_skills_ignores_folders_without_skill_md() {
     create_mock_skill(temp_path, "valid-skill", "Valid Skill", "Rust");
 
     // Create a folder without SKILL.md
-    fs::create_dir_all(temp_path.join("invalid-folder"))
-        .expect("Failed to create invalid folder");
+    fs::create_dir_all(temp_path.join("invalid-folder")).expect("Failed to create invalid folder");
 
     let skills = discover_skills(temp_path).expect("Failed to discover skills");
     assert_eq!(skills.len(), 1, "Should only find the valid skill");
@@ -88,7 +87,7 @@ fn test_discover_skills_handles_empty_directory() {
 // Helper function to create mock skills
 fn create_mock_skill(base_path: &Path, name: &str, description: &str, _language: &str) {
     let skill_dir = base_path.join(name);
-    fs::create_dir_all(&skill_dir).expect(&format!("Failed to create {} dir", name));
+    fs::create_dir_all(&skill_dir).unwrap_or_else(|_| panic!("Failed to create {} dir", name));
 
     let skill_md_content = format!(
         r#"---
@@ -105,5 +104,5 @@ This is a test skill.
     );
 
     fs::write(skill_dir.join("SKILL.md"), skill_md_content)
-        .expect(&format!("Failed to write SKILL.md for {}", name));
+        .unwrap_or_else(|_| panic!("Failed to write SKILL.md for {}", name));
 }

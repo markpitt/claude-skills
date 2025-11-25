@@ -49,7 +49,7 @@ jobs:
         run: cd skills-tui && wasm-pack build --target web --release 2>/dev/null || echo "wasm-pack build skipped (library crate)"
 
       - name: Upload WebAssembly artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: skills-tui-wasm
           path: skills-tui/target/wasm32-unknown-unknown/release/

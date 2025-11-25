@@ -4,9 +4,9 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ratatui::prelude::*;
 use ratatui::backend::CrosstermBackend;
-use skills_tui::{discover_skills, install_to_claude_code, zip_skill, ui::AppState, ui};
+use ratatui::prelude::*;
+use skills_tui::{discover_skills, install_to_claude_code, ui, ui::AppState, zip_skill};
 use std::io;
 use std::path::PathBuf;
 
@@ -115,7 +115,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, skills: Vec<skills_tui::Skill
                             app_state.status_message = "Filter cleared".to_string();
                         } else {
                             app_state.filter = Some(String::new());
-                            app_state.status_message = "Filter enabled (not fully implemented yet)".to_string();
+                            app_state.status_message =
+                                "Filter enabled (not fully implemented yet)".to_string();
                         }
                     }
                     _ => {}

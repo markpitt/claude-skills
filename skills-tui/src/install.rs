@@ -1,7 +1,7 @@
+use anyhow::{Context, Result};
+use std::fs;
 use std::path::{Path, PathBuf};
 use thiserror::Error;
-use anyhow::{Result, Context};
-use std::fs;
 
 #[derive(Debug, Error)]
 pub enum InstallError {
@@ -29,7 +29,9 @@ pub fn get_claude_code_skills_dir() -> Result<PathBuf> {
         if let Ok(home) = std::env::var("HOME") {
             Ok(PathBuf::from(home).join(".config/claude/skills"))
         } else {
-            Err(anyhow::anyhow!("Cannot determine Claude Code skills directory"))
+            Err(anyhow::anyhow!(
+                "Cannot determine Claude Code skills directory"
+            ))
         }
     }
 }
@@ -47,8 +49,7 @@ fn copy_dir_all(src: &Path, dst: &Path) -> Result<()> {
         if path.is_dir() {
             copy_dir_all(&path, &dst_path)?;
         } else {
-            fs::copy(&path, &dst_path)
-                .context(format!("Failed to copy file: {:?}", file_name))?;
+            fs::copy(&path, &dst_path).context(format!("Failed to copy file: {:?}", file_name))?;
         }
     }
 
@@ -80,7 +81,10 @@ pub fn install_to_claude_code(skill_path: &Path, destination: Option<&Path>) -> 
 }
 
 /// Installs a skill to Claude Desktop
-pub fn install_to_claude_desktop(skill_path: &Path, _config_path: Option<&Path>) -> Result<PathBuf> {
+pub fn install_to_claude_desktop(
+    skill_path: &Path,
+    _config_path: Option<&Path>,
+) -> Result<PathBuf> {
     // For now, just return the installed path (actual MCP config handling will be added later)
     let skill_name = skill_path
         .file_name()

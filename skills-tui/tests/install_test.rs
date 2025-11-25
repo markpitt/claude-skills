@@ -1,5 +1,5 @@
-use std::fs;
 use skills_tui::discover_skills;
+use std::fs;
 
 #[test]
 fn test_install_to_claude_code_copies_skill_files() {
@@ -63,8 +63,13 @@ version: 1.0
 "#;
 
     fs::write(skill_dir.join("SKILL.md"), skill_md_content).expect("Failed to write SKILL.md");
-    fs::write(skill_dir.join("resources/reference.md"), "Reference material").expect("Failed to write reference");
-    fs::write(skill_dir.join("templates/form.yaml"), "template: form").expect("Failed to write template");
+    fs::write(
+        skill_dir.join("resources/reference.md"),
+        "Reference material",
+    )
+    .expect("Failed to write reference");
+    fs::write(skill_dir.join("templates/form.yaml"), "template: form")
+        .expect("Failed to write template");
     fs::write(skill_dir.join("scripts/setup.sh"), "#!/bin/bash").expect("Failed to write script");
 
     // Discover the skill

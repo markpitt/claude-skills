@@ -36,9 +36,7 @@ impl AppState {
         if let Some(filter) = &self.filter {
             self.skills
                 .iter()
-                .filter(|skill| {
-                    skill.name.contains(filter) || skill.description.contains(filter)
-                })
+                .filter(|skill| skill.name.contains(filter) || skill.description.contains(filter))
                 .collect()
         } else {
             self.skills.iter().collect()
@@ -94,8 +92,10 @@ fn detect_language(name: &str, _path: &std::path::Path) -> String {
         "Rust".to_string()
     } else if name_lower.contains("python") || name_lower.contains("py") {
         "Python".to_string()
-    } else if name_lower.contains("typescript") || name_lower.contains("javascript")
-        || name_lower.contains("ts") || name_lower.contains("js")
+    } else if name_lower.contains("typescript")
+        || name_lower.contains("javascript")
+        || name_lower.contains("ts")
+        || name_lower.contains("js")
     {
         "TypeScript".to_string()
     } else if name_lower.contains("go") {
@@ -111,25 +111,13 @@ fn detect_language(name: &str, _path: &std::path::Path) -> String {
 pub fn render(f: &mut Frame, state: &AppState) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(
-            [
-                Constraint::Min(3),
-                Constraint::Length(3),
-            ]
-            .as_ref(),
-        )
+        .constraints([Constraint::Min(3), Constraint::Length(3)].as_ref())
         .split(f.size());
 
     // Main content area (top)
     let main_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(
-            [
-                Constraint::Percentage(30),
-                Constraint::Percentage(70),
-            ]
-            .as_ref(),
-        )
+        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)].as_ref())
         .split(chunks[0]);
 
     // Left pane: Skill list

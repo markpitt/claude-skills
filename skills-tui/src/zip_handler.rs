@@ -1,7 +1,7 @@
-use std::path::{Path, PathBuf};
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::Write;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 use zip::ZipWriter;
 
@@ -16,16 +16,13 @@ pub fn zip_skill(skill_path: &Path, output_path: &Path) -> Result<PathBuf> {
     std::fs::create_dir_all(output_path).context("Failed to create output directory")?;
 
     let zip_path = output_path.join(format!("{}.zip", skill_name));
-    let zip_file = File::create(&zip_path)
-        .context(format!("Failed to create zip file: {:?}", zip_path))?;
+    let zip_file =
+        File::create(&zip_path).context(format!("Failed to create zip file: {:?}", zip_path))?;
 
     let mut zip = ZipWriter::new(zip_file);
 
     // Walk through all files in the skill directory
-    for entry in WalkDir::new(skill_path)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
+    for entry in WalkDir::new(skill_path).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         let relative_path = path
             .strip_prefix(skill_path)
@@ -42,8 +39,8 @@ pub fn zip_skill(skill_path: &Path, output_path: &Path) -> Result<PathBuf> {
             zip.start_file(file_path, Default::default())
                 .context("Failed to add file to zip")?;
 
-            let mut file = std::fs::File::open(path)
-                .context(format!("Failed to open file: {:?}", path))?;
+            let mut file =
+                std::fs::File::open(path).context(format!("Failed to open file: {:?}", path))?;
             let mut contents = Vec::new();
             std::io::Read::read_to_end(&mut file, &mut contents)
                 .context("Failed to read file contents")?;
