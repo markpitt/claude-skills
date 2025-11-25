@@ -32,19 +32,23 @@ This directory contains automated CI/CD workflows for the Claude Skills reposito
 - Click "Actions" tab → Select workflow run → Download artifacts from "Artifacts" section
 - Or download from GitHub Releases (for tagged releases)
 
-### 2. WebAssembly Build (`wasm.yml`)
+### 2. WebAssembly Build (`wasm.yml`) - DISABLED
 
-**Triggers:** Push to main/develop or PRs with changes to skills-tui
+**Status:** ⚠️ **Disabled by default** (manual trigger only)
 
-**What it does:**
-- Builds skills-tui for WebAssembly target (`wasm32-unknown-unknown`)
-- Generates wasm-pack bundles for web integration
-- Uploads WebAssembly artifacts
+**Why disabled:**
+- A TUI application fundamentally doesn't work in browsers (no terminal support)
+- The `zip` crate dependency requires `bzip2-sys`, which cannot compile for `wasm32-unknown-unknown` (C standard library missing)
+- WebAssembly builds are impractical for this project's current scope
 
-**Note:** WebAssembly builds are for potential future web-based components. The TUI itself is terminal-based and doesn't run in browsers.
+**Manual Triggering (if needed):**
+If you want to attempt a WASM build for library components:
+1. Go to Actions → WebAssembly Build
+2. Click "Run workflow" button
+3. Select desired branch
 
-**Artifacts Generated:**
-- `skills-tui-wasm`: WebAssembly build output and bindings
+**Future Use:**
+If the codebase is refactored to separate library components without zip/bzip2 dependencies, WASM builds can be re-enabled for web-based skill browsers.
 
 ### 3. Documentation (`docs.yml`)
 

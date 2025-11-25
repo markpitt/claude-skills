@@ -1,15 +1,11 @@
 name: WebAssembly Build
 
+# DISABLED: WebAssembly is not practical for a TUI application (no browser terminal support)
+# and the zip/bzip2 dependencies prevent compilation to wasm32-unknown-unknown.
+# This workflow is kept for reference and future use if needed for library components.
+
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - 'skills-tui/**'
-      - '.github/workflows/wasm.yml'
-  pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'skills-tui/**'
+  workflow_dispatch:  # Manual trigger only
 
 env:
   CARGO_TERM_COLOR: always
