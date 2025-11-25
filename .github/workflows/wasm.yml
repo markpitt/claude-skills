@@ -1,0 +1,51 @@
+name: WebAssembly Build
+
+# DISABLED: WebAssembly is not practical for a TUI application (no browser terminal support)
+# and the zip/bzip2 dependencies prevent compilation to wasm32-unknown-unknown.
+# This workflow is kept for reference and future use if needed for library components.
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  wasm:
+    name: Build WebAssembly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.org/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build WebAssembly
+        run: cd skills-tui && cargo build --target wasm32-unknown-unknown --release
+
+      - name: Generate wasm-pack build
+        run: cd skills-tui && wasm-pack build --target web --release 2>/dev/null || echo "wasm-pack build skipped (library crate)"
+
+      - name: Upload WebAssembly artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-tui-wasm
+          path: skills-tui/target/wasm32-unknown-unknown/release/

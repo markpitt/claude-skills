@@ -1,0 +1,24 @@
+# Rust build artifacts
+/target
+**/*.rs.bk
+Cargo.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+
+# Generated files
+*.o
+*.so
+*.dylib
+
+# Test outputs
+downloads/
+*.zip

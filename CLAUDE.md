@@ -14,9 +14,73 @@ claude-skills/
 │       ├── resources/    # Optional: supporting files
 │       ├── templates/    # Optional: forms or structured prompts
 │       └── scripts/      # Optional: utility scripts
+├── skills-tui/           # Skills TUI application (see below)
+│   ├── src/              # Rust source code
+│   ├── tests/            # Test suite
+│   ├── Cargo.toml        # Rust package configuration
+│   └── README.md         # TUI documentation
 └── .claude/              # Claude Code configuration
     └── hooks/            # Repository hooks
 ```
+
+## Skills TUI Application
+
+The `skills-tui` directory contains a production-ready Terminal User Interface (TUI) application for browsing, filtering, and managing Claude Skills.
+
+### Quick Start
+
+```bash
+cd skills-tui
+
+# Build the project
+cargo build --release
+
+# Run the TUI
+cargo run -- /path/to/skills
+```
+
+### Features
+
+- **3-Pane Layout**: Navigate skills (left), view details (right), see status (bottom)
+- **Installation**: Install skills to Claude Code, Claude Desktop, or download as ZIP
+- **Search & Filter**: Find skills by name or description
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Test Coverage**: 12 comprehensive tests with 100% pass rate
+
+### Keybindings
+
+| Key | Action |
+|-----|--------|
+| `↑` / `↓` | Navigate skills |
+| `i` | Install to Claude Code |
+| `d` | Prepare for Claude Desktop |
+| `z` | Download as ZIP |
+| `f` | Toggle filter |
+| `q` | Quit |
+
+### Development
+
+All functionality is built using **Test-Driven Development (TDD)**:
+
+```bash
+# Run all tests
+cargo test
+
+# Run specific test suite
+cargo test --test discovery_test
+cargo test --test install_test
+cargo test --test zip_test
+```
+
+### Technology Stack
+
+- **Ratatui 0.27**: Modern TUI framework
+- **Crossterm 0.27**: Terminal backend
+- **Serde**: YAML parsing for SKILL.md
+- **Zip 0.6**: Archive creation
+- **Walkdir**: Directory traversal
+
+For detailed documentation, see [`skills-tui/README.md`](./skills-tui/README.md)
 
 ## Skill Structure
 
