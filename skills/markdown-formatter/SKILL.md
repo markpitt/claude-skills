@@ -2,131 +2,153 @@
 name: markdown-formatter
 description: Formats markdown files according to best practices and common style guidelines. Use when cleaning up markdown documentation, ensuring consistent formatting, or standardizing README files.
 allowed-tools: Read, Edit, Grep, Glob, Bash
-version: 1.0.0
+version: 2.0
 ---
 
 # Markdown Formatter
 
-This skill helps you format markdown files according to best practices and consistent style guidelines.
+This skill provides modular, categorized formatting guidance for markdown documents. Load resources by formatting area as needed.
 
-## When to Use This Skill
+## Quick Reference: When to Load Which Resource
 
-- Cleaning up existing markdown documentation
-- Standardizing README files across projects
-- Ensuring consistent formatting in documentation
-- Preparing markdown for publication
-- Fixing common markdown formatting issues
+| Formatting Area | Load Resource | Common Issues |
+|-----------------|---------------|---------------|
+| Headers, document structure, hierarchy | `resources/headers-hierarchy.md` | Skipped levels, underline-style, spacing |
+| Lists, nesting, indentation | `resources/lists-nesting.md` | Inconsistent markers, wrong indentation |
+| Code blocks, inline code, emphasis | `resources/code-emphasis.md` | Missing language IDs, wrong markers |
+| Links, images, references, alt text | `resources/links-images.md` | Bad link text, missing alt text |
+| Spacing, tables, final polish | `resources/spacing-tables.md` | Inconsistent spacing, table alignment |
 
-## How to Use This Skill
-
-1. **Review the style guide** in `resources/style-guide.md` for formatting rules
-2. **Check examples** in `resources/examples.md` for before/after samples
-3. **Apply formatting** systematically through the document
-4. **Validate** using the checklist in `resources/checklist.txt`
-
-## Core Formatting Rules
+## Core Rules at a Glance
 
 ### Headers
-- Use ATX-style headers (`#` notation) not underline style
-- One H1 (`#`) per document (typically the title)
-- Don't skip header levels (e.g., don't go from H1 to H3)
-- Add blank line before and after headers (except at start of file)
-- No trailing punctuation in headers
+- **ATX-style**: Use `#` notation, not underlines
+- **One per document**: Single H1 at start
+- **No skips**: Go H1 → H2 → H3, never skip levels
+- **Spacing**: Blank line before (except first) and after each header
 
 ### Lists
-- Use `-` for unordered lists (not `*` or `+`)
-- Use `1.` for ordered lists (auto-numbering)
-- Indent nested lists with 2 spaces
-- Add blank line before and after list blocks
-- Ensure consistent indentation within lists
+- **Marker**: Use `-` consistently (not `*` or `+`)
+- **Indentation**: 2 spaces per nesting level
+- **Spacing**: Blank line before and after list blocks
 
-### Code Blocks
-- Use fenced code blocks (```) not indentation
-- Always specify language for syntax highlighting
-- Add blank line before and after code blocks
-- Use single backticks for inline code
+### Code
+- **Inline**: Single backticks for code references
+- **Blocks**: Fenced (not indented) with language ID
+- **Spacing**: Blank line before and after blocks
 
-### Links and Images
-- Use reference-style links for repeated URLs
-- Add descriptive alt text for images
-- Keep link text meaningful (avoid "click here")
-- Ensure URLs are properly encoded
+### Links & Images
+- **Links**: Descriptive text (no "click here")
+- **References**: Use reference-style for repeated URLs
+- **Images**: Always include meaningful alt text
 
-### Spacing and Line Length
-- One blank line between sections
-- Two blank lines before major sections (if desired by project)
-- No trailing whitespace on lines
-- Line length: prefer 80-120 characters for readability (not enforced strictly)
-- Single newline at end of file
+### Spacing
+- **Between blocks**: One blank line
+- **No trailing whitespace**: Remove all line-end spaces
+- **End of file**: Single newline
 
-### Emphasis
-- Use `**bold**` for strong emphasis (not `__bold__`)
-- Use `*italic*` for emphasis (not `_italic_`)
-- Don't use bold or italic for headers
+### Spacing
+- **Between blocks**: One blank line
+- **No trailing whitespace**: Remove all line-end spaces
+- **End of file**: Single newline
 
-### Tables
-- Align table columns with proper spacing
-- Use header separator row with at least 3 dashes
-- Add blank line before and after tables
+## Formatting Workflow
 
-## Formatting Process
+### Phase 1: Structural Scan
+Check high-level structure first:
+1. Read entire file to understand flow
+2. Load `resources/headers-hierarchy.md` if issues found
+3. Verify H1 count, levels, and spacing
 
-1. **Read the file**: Use Read tool to examine current state
-2. **Identify issues**: Check against style guide
-3. **Apply fixes**: Use Edit tool for corrections
-   - Start with structural issues (headers, spacing)
-   - Fix list formatting
-   - Correct code blocks
-   - Standardize emphasis
-   - Clean up links
-4. **Verify**: Review changes against checklist
+### Phase 2: Block-Level Formatting
+Process each formatting category in sequence:
+1. **Headers** → `headers-hierarchy.md`
+2. **Lists** → `lists-nesting.md`
+3. **Code** → `code-emphasis.md`
+4. **Links/Images** → `links-images.md`
 
-## Output Format
+### Phase 3: Final Polish
+Complete document-level formatting:
+1. Load `resources/spacing-tables.md`
+2. Fix spacing around all blocks
+3. Validate tables (if present)
+4. Check line length and trailing whitespace
+5. Verify single trailing newline
 
-When formatting files, provide:
-- **Summary**: Brief overview of changes made
-- **Issues Fixed**: List of corrections applied
-- **Recommendations**: Suggestions for content improvements (if any)
+### Phase 4: Validation
+Use validation tools to catch remaining issues:
+```bash
+./skills/markdown-formatter/scripts/validate-markdown.sh file.md
+```
 
-## Common Issues and Fixes
+## How to Use Resources
+
+Each resource file is **self-contained** and covers one formatting area:
+
+- **Headers**: Read full file once for complete header guidance
+- **Lists**: Reference indentation rules and spacing requirements
+- **Code**: Check inline vs. block syntax and language identifiers
+- **Links/Images**: Verify alt text guidelines and reference styles
+- **Spacing**: Apply final polish and table formatting
+
+### Resource Structure
+
+Each resource includes:
+- **Syntax examples** (correct and incorrect)
+- **Rules and guidelines** (with explanations)
+- **Common issues and fixes** (before/after)
+- **Validation checklist** (quick verification)
+
+### Resource Structure
+
+Each resource includes:
+- **Syntax examples** (correct and incorrect)
+- **Rules and guidelines** (with explanations)
+- **Common issues and fixes** (before/after)
+- **Validation checklist** (quick verification)
+
+## Common Formatting Issues
 
 ### Issue: Inconsistent List Markers
 ```markdown
-<!-- Before -->
+<!-- Before: mixed markers -->
 * Item 1
 + Item 2
 - Item 3
 
-<!-- After -->
+<!-- After: consistent -->
 - Item 1
 - Item 2
 - Item 3
 ```
+→ Load `resources/lists-nesting.md` for full guidance
 
 ### Issue: Missing Code Block Language
 ```markdown
 <!-- Before -->
 ```
-code here
+npm install
 ```
 
 <!-- After -->
-```python
-code here
+```bash
+npm install
 ```
 ```
+→ Load `resources/code-emphasis.md`
 
-### Issue: Improper Header Spacing
+### Issue: Skipped Header Levels
 ```markdown
 <!-- Before -->
-# Header
-Content immediately after
+# Title
+### Subsection (skipped H2!)
 
 <!-- After -->
-# Header
-
-Content with proper spacing
+# Title
+## Section
+### Subsection
 ```
+→ Load `resources/headers-hierarchy.md`
 
 ### Issue: Bad Link Text
 ```markdown
@@ -134,45 +156,156 @@ Content with proper spacing
 Click [here](url) for details
 
 <!-- After -->
-See the [installation guide](url) for details
+See the [installation guide](url)
 ```
+→ Load `resources/links-images.md`
 
-## Advanced Features
+### Issue: Missing Alt Text
+```markdown
+<!-- Before -->
+![](screenshot.png)
 
-### Validation Script
-Use `scripts/validate-markdown.sh` to check files before formatting:
+<!-- After -->
+![Dashboard showing user metrics](screenshot.png)
+```
+→ Load `resources/links-images.md`
+
+## Output Format
+
+When formatting files, provide:
+
+**Summary**
+- Original line count
+- New line count
+- Primary issues fixed
+
+**Issues Fixed**
+- List each category of corrections
+- Count of fixes per category
+
+**Recommendations**
+- Content improvements (if any)
+- Consistency notes
+- Accessibility enhancements
+
+## Formatting Decision Table
+
+Use this table to decide what to fix and in what order:
+
+| Priority | Category | When to Address | Load Resource |
+|----------|----------|-----------------|----------------|
+| 1 | Structure | First pass—headers, hierarchy | headers-hierarchy.md |
+| 2 | Lists | Check consistency, indentation | lists-nesting.md |
+| 3 | Code | Verify blocks have language IDs | code-emphasis.md |
+| 4 | Links/Images | Descriptive text, alt text | links-images.md |
+| 5 | Spacing | Final polish, cleanup | spacing-tables.md |
+
+## Best Practices
+
+### Preserve Content
+Never change the meaning or information—only format structure.
+
+### Be Consistent
+Apply rules uniformly throughout the document.
+
+### Respect Context
+Some projects may have specific conventions. Ask if unclear.
+
+### Document Changes
+Clearly explain what was modified and why.
+
+## Limitations
+
+This skill does **not**:
+- Check spelling or grammar
+- Validate external links
+- Optimize images
+- Enforce strict line length
+
+## Integration Points
+
+**Works with:**
+- Linters (markdownlint, etc.)
+- CI/CD pipelines (pre-commit hooks)
+- Documentation generators
+- Static site builders
+
+**Pairs well with:**
+- GitHub issue templates
+- README standards
+- Style guides
+- Documentation style checkers
+
+## Resource Index
+
+| Resource | Lines | Coverage |
+|----------|-------|----------|
+| headers-hierarchy.md | 250+ | Headers, hierarchy, structure |
+| lists-nesting.md | 350+ | Lists, nesting, indentation |
+| code-emphasis.md | 300+ | Code blocks, inline code, emphasis |
+| links-images.md | 400+ | Links, images, alt text, references |
+| spacing-tables.md | 350+ | Spacing, tables, document polish |
+
+## Validation Tools
+
+### Script: validate-markdown.sh
 ```bash
 ./skills/markdown-formatter/scripts/validate-markdown.sh file.md
 ```
 
-### Batch Processing
-For multiple files:
-1. Use Glob to find all markdown files
-2. Process each file systematically
-3. Report summary of changes
+Checks for:
+- Missing newline at end
+- Trailing whitespace
+- Code blocks without language ID
+- Inconsistent list markers
+- Bad link text
+- Missing alt text
+- Multiple blank lines
 
-## Guidelines
+## Guidelines for Complex Documents
 
-- **Preserve content**: Never change the meaning or information
-- **Be consistent**: Apply rules uniformly throughout
-- **Respect context**: Some projects may have specific conventions
-- **Document changes**: Clearly explain what was modified
-- **Ask if uncertain**: Clarify project-specific preferences when needed
+### Large Documents (1000+ lines)
+1. Process by section (headers first)
+2. Validate each section before moving on
+3. Run full validation at end
 
-## Integration with Other Tools
+### Documents with Code
+1. Ensure all code blocks have language IDs
+2. Verify inline code uses backticks correctly
+3. Check code examples for syntax errors
 
-This skill works well with:
-- Linters: Can fix issues identified by markdownlint
-- CI/CD: Can be part of pre-commit formatting
-- Documentation: Can standardize docs before publication
+### Documents with Heavy Linking
+1. Use reference-style for repeated URLs
+2. Verify all links are descriptive
+3. Validate internal anchors work
 
-## Limitations
+### Documents with Tables
+1. Align columns for readability
+2. Ensure header row present
+3. Verify separator row has 3+ dashes
 
-- Does not check spelling or grammar
-- Does not validate external links
-- Does not optimize images
-- Does not enforce specific line length (guideline only)
+## When Uncertain
 
-## References
+- **Multiple conventions present?** Ask the user for project preference
+- **Non-standard markdown?** Check rendering before proceeding
+- **Content ambiguous?** Clarify with user before formatting
+- **Extensive changes needed?** Show before/after samples first
 
-See `resources/style-guide.md` for complete formatting rules and `resources/examples.md` for detailed before/after examples.
+## Quick Checklist
+
+After formatting, verify:
+- [ ] Single H1 at document start
+- [ ] ATX-style headers with proper spacing
+- [ ] Consistent list markers (all `-`)
+- [ ] Code blocks have language IDs
+- [ ] All code formatted correctly
+- [ ] Links have descriptive text
+- [ ] Images have alt text
+- [ ] Proper spacing around all blocks
+- [ ] No trailing whitespace
+- [ ] Single newline at end
+- [ ] Document renders correctly
+
+---
+
+**Next Steps**: Load the appropriate resource file from the Quick Reference table above based on the formatting issues you've identified in the document.
