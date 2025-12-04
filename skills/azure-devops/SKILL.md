@@ -6,11 +6,11 @@ version: 1.0
 
 # Azure DevOps API Skill
 
-This skill provides comprehensive guidance for working with the Azure DevOps REST API, which enables programmatic access to Azure DevOps Services and Azure DevOps Server (formerly Team Foundation Server).
+This skill provides comprehensive guidance for working with the Azure DevOps REST API, enabling programmatic access to all Azure DevOps Services and Azure DevOps Server resources.
 
 ## Overview
 
-Azure DevOps REST API is a RESTful web API that enables you to access and manage Azure DevOps resources including work items, repositories, pipelines, test plans, and artifacts.
+Azure DevOps REST API is a RESTful web API enabling you to access and manage work items, repositories, pipelines, test plans, artifacts, and more across all Azure DevOps services.
 
 **Base URL:** `https://dev.azure.com/{organization}/{project}/_apis/{area}/{resource}?api-version={version}`
 - **Organization:** Your Azure DevOps organization name
