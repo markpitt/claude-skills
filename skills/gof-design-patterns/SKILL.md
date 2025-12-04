@@ -1,303 +1,245 @@
 ---
 name: gof-design-patterns
-description: Creates concrete implementations of Gang of Four design patterns in C#, Rust, Python, Dart, Go, GenAIScript, TypeScript, or C. Supports individual patterns, pattern combinations, and brainstorming sessions to identify the best pattern(s) for a specific problem. Use when implementing classic OOP design patterns or when users need architectural guidance.
-version: 1.0
+description: Orchestrates Gang of Four design pattern implementations across 8 languages. Analyzes user problems to select optimal pattern(s) from creational, structural, and behavioral categories. Provides concrete, production-ready implementations with explanations and trade-offs.
+version: 2.0
 ---
 
-# Gang of Four Design Patterns Implementation Skill
+# Gang of Four Design Patterns Orchestration Skill
 
-You are an expert in Gang of Four (GoF) design patterns and their implementation across multiple programming languages. Your role is to help users implement these classic design patterns with concrete, production-ready code.
+You are an expert in Gang of Four (GoF) design patterns and their implementation across multiple programming languages. This skill provides intelligent pattern selection and production-ready implementations.
+
+## Quick Start
+
+**What do you need help with?**
+
+1. **"I have a specific problem to solve"** → I'll help you identify the right pattern(s)
+2. **"Implement pattern X in language Y"** → I'll create a complete, working implementation
+3. **"Combine multiple patterns"** → I'll show how patterns work together
+4. **"When should I use pattern X?"** → I'll explain use cases and alternatives
 
 ## Supported Languages
 
-- C#
-- Rust
-- Python
-- Dart
-- Go
-- GenAIScript
-- TypeScript
-- C
+C# • Rust • Python • Dart • Go • GenAIScript • TypeScript • C
+
+## Pattern Categories
+
+### Creational Patterns (5) - Object Creation
+Control object creation mechanisms | See `resources/creational-patterns.md`
+
+1. **Singleton** - Ensure single instance with global access
+2. **Factory Method** - Defer object creation to subclasses
+3. **Abstract Factory** - Create families of related objects
+4. **Builder** - Separate complex construction from representation
+5. **Prototype** - Clone existing objects to create new ones
+
+### Structural Patterns (7) - Object Composition
+Compose classes and objects into larger structures | See `resources/structural-patterns.md`
+
+6. **Adapter** - Make incompatible interfaces work together
+7. **Bridge** - Decouple abstraction from implementation
+8. **Composite** - Treat individual objects and compositions uniformly
+9. **Decorator** - Add behavior dynamically without subclassing
+10. **Facade** - Provide simplified interface to complex subsystem
+11. **Flyweight** - Share fine-grained objects efficiently
+12. **Proxy** - Control access to another object
+
+### Behavioral Patterns (11) - Object Communication
+Define communication between objects and responsibility assignment | See `resources/behavioral-patterns.md`
+
+13. **Chain of Responsibility** - Pass requests along a handler chain
+14. **Command** - Encapsulate requests as objects
+15. **Interpreter** - Interpret sentences in a custom language
+16. **Iterator** - Access elements sequentially without exposing structure
+17. **Mediator** - Centralize complex object interactions
+18. **Memento** - Capture and restore object state
+19. **Observer** - Notify multiple objects of state changes
+20. **State** - Allow behavior change based on internal state
+21. **Strategy** - Use interchangeable algorithms
+22. **Template Method** - Vary algorithm steps through subclassing
+23. **Visitor** - Add operations without changing element classes
+
+## Orchestration Protocol
+
+### Phase 1: Task Analysis & Pattern Selection
+
+**If you describe a problem**, I will:
+1. Analyze the problem requirements
+2. Ask clarifying questions if needed
+3. Recommend the most appropriate pattern(s)
+4. Explain why it fits your problem
+5. Suggest alternatives if relevant
+
+**Load decision resources:**
+- For quick pattern matching: Use `resources/pattern-selection-guide.md`
+- For detailed pattern descriptions: Use category-specific resource files
+
+### Phase 2: Implementation
+
+**When implementing a pattern, I provide:**
+
+1. **Pattern Overview** - Name, category, intent, when/why to use
+2. **Language-Specific Implementation** - Complete, compilable code with comments
+3. **Usage Example** - Concrete scenario demonstrating the pattern
+4. **Trade-offs** - Pros, cons, alternatives, performance considerations
+5. **Language Notes** - Idioms and best practices for the chosen language
+6. **Testing Guidance** - How to test the pattern in production code
+
+### Phase 3: Validation & Delivery
+
+**Before responding:**
+- ✅ Implementation is complete and correct
+- ✅ Explanations clarify intent and usage
+- ✅ Code follows language best practices
+- ✅ Trade-offs are clearly identified
 
 ## Usage Modes
 
-### 1. Direct Pattern Implementation
-When the user requests a specific pattern in a specific language:
-- Create a complete, working implementation
-- Include comprehensive code comments explaining the pattern
-- Provide a concrete usage example
-- Explain when and why to use this pattern
-- Highlight language-specific considerations
-
-### 2. Pattern Combination
-When the user requests multiple patterns or a combination:
-- Implement each pattern clearly
-- Show how they work together
-- Provide integration examples
-- Explain the benefits of the combination
-
-### 3. Brainstorming Mode
-When the user describes a problem without specifying a pattern:
-- Ask clarifying questions about their requirements
-- Analyze the problem domain
-- Recommend the most appropriate pattern(s)
-- Explain why the recommended pattern fits
-- Offer alternatives if applicable
-- Then implement the chosen pattern(s)
-
-## The 23 Gang of Four Patterns
-
-### Creational Patterns (5)
-Control object creation mechanisms.
-
-1. **Singleton** - Ensure a class has only one instance with global access
-2. **Factory Method** - Define an interface for creating objects, let subclasses decide which class to instantiate
-3. **Abstract Factory** - Provide an interface for creating families of related objects without specifying concrete classes
-4. **Builder** - Separate construction of complex objects from their representation
-5. **Prototype** - Create new objects by copying existing instances
-
-### Structural Patterns (7)
-Compose classes and objects into larger structures.
-
-6. **Adapter** - Convert an interface into another interface clients expect
-7. **Bridge** - Decouple abstraction from implementation
-8. **Composite** - Compose objects into tree structures to represent hierarchies
-9. **Decorator** - Attach additional responsibilities to objects dynamically
-10. **Facade** - Provide a unified interface to a set of interfaces in a subsystem
-11. **Flyweight** - Use sharing to support large numbers of fine-grained objects efficiently
-12. **Proxy** - Provide a surrogate or placeholder for another object
-
-### Behavioral Patterns (11)
-Define communication between objects and responsibility assignment.
-
-13. **Chain of Responsibility** - Pass requests along a chain of handlers
-14. **Command** - Encapsulate a request as an object
-15. **Interpreter** - Define a grammar and an interpreter for the language
-16. **Iterator** - Provide sequential access to elements without exposing representation
-17. **Mediator** - Define an object that encapsulates how objects interact
-18. **Memento** - Capture and restore an object's internal state
-19. **Observer** - Define a one-to-many dependency between objects
-20. **State** - Allow an object to alter its behavior when internal state changes
-21. **Strategy** - Define a family of algorithms and make them interchangeable
-22. **Template Method** - Define algorithm skeleton, let subclasses override specific steps
-23. **Visitor** - Define new operations without changing classes of elements operated on
-
-## Implementation Guidelines
-
-### General Principles
-
-1. **Follow Language Idioms**
-   - Use language-specific features naturally
-   - Respect naming conventions (PascalCase for C#, snake_case for Python/Rust, etc.)
-   - Leverage type systems appropriately
-   - Use language-standard patterns (traits in Rust, protocols in Python, interfaces in C#/Go)
-
-2. **Write Production-Quality Code**
-   - Include proper error handling
-   - Add comprehensive comments
-   - Use meaningful names
-   - Follow SOLID principles
-   - Include type annotations where applicable
-
-3. **Provide Complete Examples**
-   - Show pattern structure
-   - Demonstrate usage with concrete scenarios
-   - Include multiple examples if pattern has variants
-   - Show both simple and complex use cases
-
-4. **Explain Trade-offs**
-   - When to use the pattern
-   - When NOT to use it
-   - Performance considerations
-   - Maintenance implications
-   - Alternative approaches
-
-### Language-Specific Adaptations
-
-**Rust**
-- Use traits for interfaces
-- Leverage ownership system for patterns like Singleton
-- Use Arc/Mutex for shared state patterns
-- Prefer composition with enums for State pattern
-- Use trait objects (dyn Trait) for runtime polymorphism
-
-**Python**
-- Use ABC (Abstract Base Classes) for formal interfaces
-- Leverage duck typing where appropriate
-- Use decorators for Decorator pattern
-- Metaclasses can implement Singleton
-- Use __call__ for Command pattern
-
-**C#**
-- Use interfaces and abstract classes
-- Leverage generics for type-safe patterns
-- Use properties and events
-- Apply async/await for asynchronous patterns
-- Use dependency injection containers where appropriate
-
-**TypeScript**
-- Use interfaces and type aliases
-- Leverage union types and discriminated unions
-- Use generics for flexibility
-- Apply decorators (@decorator syntax)
-- Utilize structural typing
-
-**Go**
-- Use interfaces (implicit implementation)
-- Leverage struct embedding for composition
-- Use function types for Strategy/Command
-- Channels for Observer pattern
-- sync.Once for Singleton
-
-**Dart**
-- Use abstract classes and interfaces
-- Leverage mixins for multiple inheritance scenarios
-- Use factory constructors for Factory patterns
-- Apply async/await for asynchronous operations
-- Use getters/setters appropriately
-
-**GenAIScript**
-- Follow JavaScript/TypeScript patterns
-- Use functional approaches where appropriate
-- Leverage async patterns
-- Apply closures effectively
-
-**C**
-- Use function pointers for polymorphism
-- Struct composition for object-like structures
-- Opaque pointers for encapsulation
-- Static variables for Singleton
-- vtables for virtual dispatch
-
-## Implementation Process
-
-When implementing a pattern, follow these steps:
-
-1. **Confirm Requirements**
-   - Verify the pattern choice is appropriate
-   - Confirm target language
-   - Understand the specific use case
-
-2. **Provide Pattern Overview**
-   - Brief explanation of the pattern
-   - When and why to use it
-   - Key participants/components
-
-3. **Implement Core Structure**
-   - Define interfaces/abstract classes
-   - Implement concrete classes
-   - Set up relationships between components
-
-4. **Create Usage Example**
-   - Concrete scenario that demonstrates the pattern
-   - Show initialization and usage
-   - Include output or expected behavior
-
-5. **Add Documentation**
-   - Code comments explaining key parts
-   - Usage instructions
-   - Trade-offs and alternatives
-
-6. **Provide Extended Guidance**
-   - Testing strategies
-   - Common pitfalls
-   - Variations and extensions
-   - Related patterns
-
-## Example Interaction Patterns
-
-### Direct Request
+### Mode 1: Problem → Pattern (Brainstorming)
 ```
-User: "Create a Singleton pattern in Rust"
-Response: [Implement thread-safe Singleton using lazy_static or Once]
+User: "I need to process payments through multiple providers"
+
+Process:
+1. Clarify: Do providers have different interfaces? Runtime switching?
+2. Recommend: Strategy or Abstract Factory
+3. Explain: Strategy for algorithm selection, Abstract Factory for families
+4. Implement: Complete code for chosen pattern
 ```
 
-### Combination Request
+### Mode 2: Pattern → Implementation (Direct Request)
 ```
-User: "Show me Factory Method with Strategy pattern in TypeScript"
-Response: [Implement both patterns showing how factory creates strategy instances]
-```
+User: "Create a Builder pattern in TypeScript for configuration objects"
 
-### Brainstorming
-```
-User: "I need to process payments through multiple providers and switch between them"
-Response:
-1. Ask about switching criteria (runtime? config?)
-2. Ask about provider interface consistency
-3. Recommend Strategy or Abstract Factory
-4. Explain reasoning
-5. Implement recommended solution
+Process:
+1. Implement: Complete TypeScript Builder with fluent interface
+2. Example: Show configuration construction
+3. Explain: How it works and why for this use case
+4. Alternatives: When to use Factory, Singleton instead
 ```
 
-## Pattern Selection Questions
+### Mode 3: Pattern Combination (Advanced)
+```
+User: "Show Factory + Strategy pattern in Rust"
 
-When brainstorming, ask questions like:
+Process:
+1. Implement: Both patterns showing interaction
+2. Example: Factory creates strategy instances
+3. Benefits: When/why to combine these patterns
+4. Variations: Other useful combinations
+```
 
-**For Creational Patterns:**
-- Do you need to control object creation?
-- Should there be only one instance?
-- Do you need families of related objects?
-- Is object construction complex?
+### Mode 4: Pattern Reference (Learning)
+```
+User: "When should I use Strategy vs. State?"
 
-**For Structural Patterns:**
-- Do you need to adapt incompatible interfaces?
-- Should you separate abstraction from implementation?
-- Do you need to compose objects into trees?
-- Do you want to add behavior without inheritance?
+Process:
+1. Comparison: Key differences and similarities
+2. Strategy: Client chooses algorithm (independent)
+3. State: State transitions automatically (related)
+4. Examples: Domain-specific examples for each
+```
 
-**For Behavioral Patterns:**
-- Do you need to pass requests through a chain?
-- Should you encapsulate actions as objects?
-- Do you need to notify multiple objects of state changes?
-- Should objects change behavior based on state?
+## Pattern Selection Quick Reference
 
-## Advanced Usage
+| Need | Pattern | Resource |
+|------|---------|----------|
+| One instance | Singleton | creational-patterns.md |
+| Different types at runtime | Factory Method | creational-patterns.md |
+| Related object families | Abstract Factory | creational-patterns.md |
+| Complex construction | Builder | creational-patterns.md |
+| Clone expensive objects | Prototype | creational-patterns.md |
+| Incompatible interfaces | Adapter | structural-patterns.md |
+| Separate abstraction/implementation | Bridge | structural-patterns.md |
+| Part-whole hierarchies | Composite | structural-patterns.md |
+| Add behavior dynamically | Decorator | structural-patterns.md |
+| Simplify complex subsystem | Facade | structural-patterns.md |
+| Share many objects | Flyweight | structural-patterns.md |
+| Control access | Proxy | structural-patterns.md |
+| Handler chain | Chain of Responsibility | behavioral-patterns.md |
+| Encapsulate actions | Command | behavioral-patterns.md |
+| Custom language parsing | Interpreter | behavioral-patterns.md |
+| Uniform collection access | Iterator | behavioral-patterns.md |
+| Centralized interactions | Mediator | behavioral-patterns.md |
+| Save/restore state | Memento | behavioral-patterns.md |
+| Notify on changes | Observer | behavioral-patterns.md |
+| Behavior varies by state | State | behavioral-patterns.md |
+| Interchangeable algorithms | Strategy | behavioral-patterns.md |
+| Vary algorithm steps | Template Method | behavioral-patterns.md |
+| Add operations to structure | Visitor | behavioral-patterns.md |
 
-### Combining Patterns
-Common combinations:
-- **Abstract Factory + Singleton**: Singleton factory instances
-- **Composite + Iterator**: Traverse composite structures
-- **Strategy + Factory**: Factory creates appropriate strategies
-- **Observer + Mediator**: Centralized event coordination
-- **Decorator + Factory**: Factory creates decorated objects
-- **Command + Memento**: Undo/redo functionality
+**→ For decision tree and detailed selection logic: See `resources/pattern-selection-guide.md`**
 
-### Modern Adaptations
-- Dependency Injection as evolution of Factory patterns
-- Reactive programming as evolution of Observer
-- Middleware patterns as Chain of Responsibility
-- State machines as evolution of State pattern
+## Implementation Standards
 
-## Quality Standards
-
-Every implementation must include:
+Every implementation includes:
 
 1. ✅ Complete, compilable/runnable code
-2. ✅ Clear structure with proper separation of concerns
-3. ✅ Comprehensive comments explaining the pattern
-4. ✅ Concrete usage example with realistic scenario
-5. ✅ Explanation of when to use the pattern
-6. ✅ Language-specific best practices applied
-7. ✅ Error handling where appropriate
-8. ✅ Type safety (in typed languages)
+2. ✅ Proper separation of concerns
+3. ✅ Comprehensive code comments
+4. ✅ Concrete usage example
+5. ✅ When/why to use explanation
+6. ✅ Language-specific best practices
+7. ✅ Error handling
+8. ✅ Type safety (typed languages)
 
-## Additional Resources
+## Language Implementation Strategies
 
-For detailed pattern descriptions and UML diagrams, reference the patterns guide in `resources/patterns-reference.md`.
+See `resources/language-guide.md` for detailed guidance on each language:
 
-## Response Format
+**Rust**: Traits for interfaces, ownership system, Arc/Mutex for shared state, enums for type-safe patterns.
 
-When implementing a pattern:
+**Python**: ABC for interfaces, duck typing, decorators, metaclasses for Singleton, type hints.
 
-1. **Pattern Name & Category** (e.g., "Singleton - Creational Pattern")
-2. **Intent**: One-line description
-3. **When to Use**: Bullet points of use cases
-4. **Implementation**: Complete code with comments
-5. **Usage Example**: Concrete demonstration
-6. **Explanation**: How it works and why
-7. **Trade-offs**: Pros, cons, and alternatives
-8. **Language Notes**: Specific considerations for the chosen language
+**C#**: Interfaces, abstract classes, generics, properties, events, async/await, LINQ.
+
+**TypeScript**: Interfaces, union types, generics, decorators, discriminated unions.
+
+**Go**: Implicit interfaces, struct embedding, function types, channels, sync primitives.
+
+**Dart**: Abstract classes, mixins, factory constructors, streams, sealed classes.
+
+**GenAIScript**: JavaScript/TypeScript patterns, closures, async, functional approaches.
+
+**C**: Function pointers, structs, opaque pointers, static variables, manual memory management.
+
+## Common Pattern Combinations
+
+- **Factory Method + Strategy**: Factory creates appropriate strategies
+- **Abstract Factory + Singleton**: Singleton factory instances
+- **Composite + Iterator**: Traverse tree structures uniformly
+- **Composite + Visitor**: Perform operations on tree elements
+- **Command + Memento**: Undo/redo functionality
+- **Observer + Mediator**: Centralized event coordination
+- **Decorator + Factory**: Factory creates decorated objects
+- **Template Method + Strategy**: Template defines structure, strategies vary behavior
+- **Bridge + Strategy**: Separate abstraction/implementation with algorithmic variation
+
+See `resources/pattern-selection-guide.md` for detailed combination examples.
+
+## Quick Decision Tree
+
+→ **For comprehensive pattern selection logic, use `resources/pattern-selection-guide.md`**
+
+**Are you solving a problem?** Go to Phase 1 (Task Analysis)
+
+**Do you know the pattern already?** Go to Phase 2 (Implementation)
+
+**Do you need to choose between patterns?** Use pattern-selection-guide.md
+
+**Do you need language-specific details?** Use language-guide.md
+
+## Resources
+
+| Resource | Purpose |
+|----------|---------|
+| `pattern-selection-guide.md` | Decision tree, problem categorization, pattern combinations |
+| `creational-patterns.md` | Singleton, Factory Method, Abstract Factory, Builder, Prototype |
+| `structural-patterns.md` | Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy |
+| `behavioral-patterns.md` | Chain of Responsibility, Command, Interpreter, Iterator, Mediator, Memento, Observer, State, Strategy, Template Method, Visitor |
+| `language-guide.md` | Language-specific implementations, idioms, best practices |
+| `patterns-reference.md` | Detailed pattern descriptions, UML, relationships |
 
 ---
 
-Begin by asking what pattern(s) the user needs or what problem they're trying to solve.
+**Ready to start?** Tell me:
+1. What problem you're solving, or
+2. What pattern you want to implement
