@@ -2,6 +2,11 @@
 
 This document provides detailed examples of how to chain and combine thinking patterns for complex problem-solving. Each example demonstrates the orchestration process from task analysis through execution.
 
+> **Related Resources**: 
+> - For pattern definitions, see: `foundational-patterns.md`, `reasoning-patterns.md`, `creative-patterns.md`, `metacognitive-patterns.md`, `specialized-patterns.md`
+> - For neurodivergent patterns: `neurodivergent-strengths.md`
+> - For orchestration guidance: Main `SKILL.md`
+
 ## Example 1: Debugging a Complex Software Issue
 
 ### Task Analysis

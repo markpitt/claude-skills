@@ -2,6 +2,8 @@
 
 This document provides detailed research findings on cognitive patterns and strengths associated with neurodivergent conditions. These patterns represent tendencies and strengths, not universal characteristics—neurodivergence is highly individual.
 
+> **Related Resources**: These patterns integrate with all other thinking patterns. See the main `SKILL.md` for orchestration guidance. Particularly complementary with patterns in `foundational-patterns.md` (Systems, Gestalt) and `creative-patterns.md` (Associative, Lateral).
+
 ## Key Principle: Cognitive Diversity as Strength
 
 Around 15% of people are neurodivergent, meaning their brains function differently from what society considers "typical." This cognitive diversity brings distinct advantages in problem-solving, creativity, and specialized reasoning.
