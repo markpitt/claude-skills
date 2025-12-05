@@ -334,6 +334,7 @@ Before implementing your chosen pattern:
 | File | Purpose | Lines | Read When |
 |--------|---------|------|------|
 | `SKILL.md` (this file) | Orchestration hub and decision guide | 280 | First (overview) |
+| `resources/augmented-llm.md` | The foundational building block | 300+ | Before any pattern |
 | `resources/core-patterns.md` | Prompt Chaining, Routing, Parallelization | 350+ | Need basic patterns |
 | `resources/dynamic-orchestration.md` | Orchestrator-Workers, Autonomous Agents | 400+ | Need dynamic patterns |
 | `resources/iterative-refinement.md` | Evaluator-Optimizer pattern | 350+ | Need quality iteration |
@@ -341,7 +342,6 @@ Before implementing your chosen pattern:
 | `resources/pattern-combinations.md` | Complex multi-pattern workflows | 400+ | Combining patterns |
 | `resources/language-implementation.md` | Language-specific code examples | 450+ | Need implementation |
 | `resources/patterns-reference.md` | Original comprehensive reference | 500+ | Deep dive reference |
-| `resources/tool-design.md` | Original tool design guide | 560+ | Tool reference |
 
 ---
 
