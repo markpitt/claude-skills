@@ -6,7 +6,10 @@ use crossterm::{
 };
 use ratatui::backend::CrosstermBackend;
 use ratatui::prelude::*;
-use skills_tui::{discover_skills, install_to_claude_code, ui, ui::AppState, zip_skill};
+use skills_tui::{
+    discover_skills, discover_skills_from_sources, install_to_claude_code, ui, ui::AppState,
+    zip_skill, FeedManager, Skill,
+};
 use std::io;
 use std::path::PathBuf;
 
@@ -19,9 +22,22 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    // Discover skills from current directory or provided path
+    // Check for --update-feeds flag
+    let update_feeds = args.iter().any(|a| a == "--update-feeds" || a == "-u");
+    
+    // Check for --feeds-config flag
+    let feeds_config_path = args
+        .iter()
+        .position(|a| a == "--feeds-config")
+        .and_then(|i| args.get(i + 1))
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("feeds.json"));
+
+    // Get skills path (first positional argument that doesn't start with -)
     let skills_path = args
-        .get(1)
+        .iter()
+        .skip(1)
+        .find(|a| !a.starts_with('-') && *a != "feeds.json")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("."));
 
@@ -30,14 +46,13 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    let skills = discover_skills(&skills_path).map_err(|e| {
-        eprintln!("Error discovering skills: {}", e);
-        e
-    })?;
+    // Load skills from local directory and feeds
+    let skills = load_skills(&skills_path, &feeds_config_path, update_feeds)?;
 
     if skills.is_empty() {
         println!("No skills found in {:?}", skills_path);
         println!("Ensure the directory contains folders with SKILL.md files");
+        println!("\nTip: Use --update-feeds to fetch skills from configured git repositories");
         return Ok(());
     }
 
@@ -49,7 +64,7 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(backend)?;
 
     // Run the app
-    let result = run_app(&mut terminal, skills);
+    let result = run_app(&mut terminal, skills, feeds_config_path);
 
     // Restore terminal
     disable_raw_mode()?;
@@ -63,7 +78,45 @@ fn main() -> Result<()> {
     result
 }
 
-fn run_app<B: Backend>(terminal: &mut Terminal<B>, skills: Vec<skills_tui::Skill>) -> Result<()> {
+/// Load skills from local directory and configured feeds
+fn load_skills(
+    local_path: &PathBuf,
+    feeds_config_path: &PathBuf,
+    update_feeds: bool,
+) -> Result<Vec<Skill>> {
+    // Try to load feed manager
+    let feed_manager = FeedManager::new(feeds_config_path.clone()).ok();
+
+    if let Some(ref manager) = feed_manager {
+        // Update feeds if requested
+        if update_feeds {
+            println!("Updating feeds...");
+            match manager.update_feeds() {
+                Ok(results) => {
+                    for (name, skills) in results {
+                        println!("  {} - {} skills", name, skills.len());
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Warning: Failed to update feeds: {}", e);
+                }
+            }
+        }
+
+        // Get all skills from all sources
+        let sources = manager.get_all_skill_paths(Some(local_path))?;
+        discover_skills_from_sources(sources)
+    } else {
+        // Fall back to local-only discovery
+        discover_skills(local_path)
+    }
+}
+
+fn run_app<B: Backend>(
+    terminal: &mut Terminal<B>,
+    skills: Vec<Skill>,
+    feeds_config_path: PathBuf,
+) -> Result<()> {
     let mut app_state = AppState::new(skills);
 
     loop {
@@ -119,6 +172,20 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, skills: Vec<skills_tui::Skill
                                 "Filter enabled (not fully implemented yet)".to_string();
                         }
                     }
+                    KeyCode::Char('u') => {
+                        // Update feeds
+                        app_state.status_message = "Updating feeds...".to_string();
+                        if let Ok(manager) = FeedManager::new(feeds_config_path.clone()) {
+                            match manager.update_feeds() {
+                                Ok(_) => {
+                                    app_state.status_message = "✓ Feeds updated".to_string();
+                                }
+                                Err(e) => {
+                                    app_state.status_message = format!("✗ Update failed: {}", e);
+                                }
+                            }
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -133,13 +200,15 @@ fn print_help() {
     println!("Skills TUI - Claude Skills Browser and Manager");
     println!();
     println!("USAGE:");
-    println!("    skills-tui [SKILLS_PATH]");
+    println!("    skills-tui [OPTIONS] [SKILLS_PATH]");
     println!();
     println!("ARGUMENTS:");
-    println!("    SKILLS_PATH    Path to directory containing skills (default: current directory)");
+    println!("    SKILLS_PATH           Path to directory containing skills (default: current directory)");
     println!();
     println!("OPTIONS:");
-    println!("    -h, --help     Print help information");
+    println!("    -h, --help            Print help information");
+    println!("    -u, --update-feeds    Update skills from configured git repositories");
+    println!("    --feeds-config FILE   Path to feeds configuration file (default: feeds.json)");
     println!();
     println!("KEYBINDINGS:");
     println!("    ↑/↓            Navigate through skills");
@@ -147,6 +216,22 @@ fn print_help() {
     println!("    d              Install skill to Claude Desktop (MCP)");
     println!("    z              Download skill as ZIP archive");
     println!("    f              Toggle filtering");
+    println!("    u              Update feeds from git repositories");
     println!("    q              Quit the application");
     println!("    Ctrl+C         Quit the application");
+    println!();
+    println!("FEED CONFIGURATION:");
+    println!("    Create a feeds.json file to configure git repository sources:");
+    println!();
+    println!("    {{");
+    println!("      \"feeds\": [");
+    println!("        {{");
+    println!("          \"name\": \"official\",");
+    println!("          \"url\": \"https://github.com/anthropics/skills.git\",");
+    println!("          \"enabled\": true,");
+    println!("          \"description\": \"Official Anthropic skills\"");
+    println!("        }}");
+    println!("      ],");
+    println!("      \"cache_dir\": \".skill-cache\"");
+    println!("    }}");
 }

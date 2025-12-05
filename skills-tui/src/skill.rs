@@ -11,6 +11,9 @@ pub struct Skill {
     pub description: String,
     pub version: Option<String>,
     pub path: PathBuf,
+    /// Source feed name (e.g., "local", "official", "community")
+    #[serde(default)]
+    pub source: String,
 }
 
 /// Frontmatter metadata from SKILL.md
@@ -54,6 +57,11 @@ pub fn discover_skills(base_path: &Path) -> Result<Vec<Skill>> {
 
 /// Parses a SKILL.md file and extracts metadata
 fn parse_skill(skill_md_path: &Path, path: PathBuf) -> Result<Skill> {
+    parse_skill_with_source(skill_md_path, path, "local".to_string())
+}
+
+/// Parses a SKILL.md file and extracts metadata with source information
+fn parse_skill_with_source(skill_md_path: &Path, path: PathBuf, source: String) -> Result<Skill> {
     let content = fs::read_to_string(skill_md_path).context("Failed to read SKILL.md")?;
 
     // Extract frontmatter
@@ -65,7 +73,27 @@ fn parse_skill(skill_md_path: &Path, path: PathBuf) -> Result<Skill> {
         description: frontmatter.description,
         version: frontmatter.version,
         path,
+        source,
     })
+}
+
+/// Discovers skills from multiple sources (local directory + feeds)
+pub fn discover_skills_from_sources(sources: Vec<(String, PathBuf)>) -> Result<Vec<Skill>> {
+    let mut skills = Vec::new();
+
+    for (source, path) in sources {
+        let skill_md_path = path.join("SKILL.md");
+        if skill_md_path.exists() {
+            match parse_skill_with_source(&skill_md_path, path, source) {
+                Ok(skill) => skills.push(skill),
+                Err(e) => eprintln!("Warning: Failed to parse skill: {}", e),
+            }
+        }
+    }
+
+    // Sort by name for consistent output
+    skills.sort_by(|a, b| a.name.cmp(&b.name));
+    Ok(skills)
 }
 
 /// Extracts YAML frontmatter from a markdown file

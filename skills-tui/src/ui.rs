@@ -173,10 +173,17 @@ fn render_skill_list(f: &mut Frame, state: &AppState, area: Rect) {
 /// Renders the right pane with skill details
 fn render_skill_details(f: &mut Frame, state: &AppState, area: Rect) {
     if let Some(skill) = state.selected_skill() {
+        let source_display = if skill.source.is_empty() {
+            "local".to_string()
+        } else {
+            skill.source.clone()
+        };
+        
         let details = format!(
-            "Name: {}\nVersion: {}\nPath: {}\n\nDescription:\n{}",
+            "Name: {}\nVersion: {}\nSource: {}\nPath: {}\n\nDescription:\n{}",
             skill.name,
             skill.version.as_deref().unwrap_or("Unknown"),
+            source_display,
             skill.path.display(),
             skill.description
         );

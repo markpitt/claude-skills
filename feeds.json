@@ -1,0 +1,23 @@
+{
+  "feeds": [
+    {
+      "name": "local",
+      "url": "",
+      "enabled": true,
+      "description": "Local skills directory"
+    },
+    {
+      "name": "anthropic-official",
+      "url": "https://github.com/anthropics/skills.git",
+      "enabled": false,
+      "description": "Official Anthropic skills repository"
+    },
+    {
+      "name": "awesome-claude-skills",
+      "url": "https://github.com/travisvn/awesome-claude-skills.git",
+      "enabled": false,
+      "description": "Community curated collection of Claude skills"
+    }
+  ],
+  "cache_dir": ".skill-cache"
+}
