@@ -430,3 +430,17 @@ Thumbs.db
 # Local testing directories
 local-test/
 test-output/
+
+# Skills TUI cache and downloads
+.skill-cache/
+downloads/
+dist/
+
+# Rust build artifacts
+skills-tui/target/
+
+# Documentation build output (generated)
+docs/
+
+# Feed clones
+feeds/
