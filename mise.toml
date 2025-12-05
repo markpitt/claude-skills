@@ -1,0 +1,152 @@
+# mise configuration for Claude Skills Repository
+# https://mise.jdx.dev/
+
+[env]
+# Project root
+SKILLS_ROOT = "{{ cwd }}/skills"
+TUI_ROOT = "{{ cwd }}/skills-tui"
+
+[tools]
+# Rust toolchain for TUI
+rust = "1.75"
+# Python for scripts
+python = "3.12"
+# Node.js for website
+node = "22"
+
+[tasks.build]
+description = "Build the skills-tui application"
+dir = "skills-tui"
+run = "cargo build --release"
+
+[tasks.dev]
+description = "Run TUI in development mode"
+dir = "skills-tui"
+run = "cargo run -- ../skills"
+
+[tasks.test]
+description = "Run all tests"
+dir = "skills-tui"
+run = "cargo test"
+
+[tasks.test-watch]
+description = "Run tests in watch mode"
+dir = "skills-tui"
+run = "cargo watch -x test"
+
+[tasks.lint]
+description = "Run linting on Rust code"
+dir = "skills-tui"
+run = "cargo clippy -- -D warnings"
+
+[tasks.format]
+description = "Format Rust code"
+dir = "skills-tui"
+run = "cargo fmt"
+
+[tasks.format-check]
+description = "Check Rust formatting"
+dir = "skills-tui"
+run = "cargo fmt --check"
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+cd skills-tui && cargo clean
+rm -rf downloads dist
+"""
+
+[tasks.install]
+description = "Install TUI globally"
+dir = "skills-tui"
+run = "cargo install --path ."
+
+[tasks."skill:init"]
+description = "Initialize a new skill"
+run = "python scripts/init_skill.py"
+usage = "mise run skill:init <skill-name> --path <output-dir>"
+
+[tasks."skill:package"]
+description = "Package a skill for distribution"
+run = "python scripts/package_skill.py"
+usage = "mise run skill:package <skill-path> [output-dir]"
+
+[tasks."skill:validate"]
+description = "Validate all skills in the repository"
+run = """
+#!/usr/bin/env bash
+echo "Validating skills..."
+errors=0
+for skill_dir in skills/*/; do
+    if [ -d "$skill_dir" ]; then
+        skill_name=$(basename "$skill_dir")
+        if [ -f "${skill_dir}SKILL.md" ]; then
+            # Check frontmatter exists
+            if head -n 1 "${skill_dir}SKILL.md" | grep -q "^---$"; then
+                echo "✓ $skill_name"
+            else
+                echo "✗ $skill_name - Missing frontmatter"
+                ((errors++))
+            fi
+        else
+            echo "✗ $skill_name - Missing SKILL.md"
+            ((errors++))
+        fi
+    fi
+done
+echo ""
+if [ $errors -eq 0 ]; then
+    echo "All skills valid!"
+else
+    echo "$errors error(s) found"
+    exit 1
+fi
+"""
+
+[tasks."skill:list"]
+description = "List all available skills"
+run = """
+#!/usr/bin/env bash
+echo "Available Skills:"
+echo "================="
+for skill_dir in skills/*/; do
+    if [ -d "$skill_dir" ] && [ -f "${skill_dir}SKILL.md" ]; then
+        skill_name=$(basename "$skill_dir")
+        description=$(grep "^description:" "${skill_dir}SKILL.md" | sed 's/description: *//' | head -1 | cut -c1-60)
+        if [ -n "$description" ]; then
+            printf "  %-25s %s...\n" "$skill_name" "$description"
+        else
+            echo "  $skill_name"
+        fi
+    fi
+done
+"""
+
+[tasks."docs:serve"]
+description = "Serve documentation website locally"
+dir = "docs"
+run = "npx serve ."
+
+[tasks."docs:build"]
+description = "Build the documentation website"
+run = "node scripts/build-docs.js"
+
+[tasks."git:feed"]
+description = "Update skills from git repositories"
+run = "python scripts/update_feeds.py"
+
+[tasks.ci]
+description = "Run all CI checks"
+depends = ["format-check", "lint", "test", "skill:validate"]
+
+[tasks.release]
+description = "Build release binaries"
+dir = "skills-tui"
+run = """
+cargo build --release
+echo "Binary available at: target/release/skills-tui"
+"""
+
+[tasks.all]
+description = "Build everything"
+depends = ["build", "docs:build"]
