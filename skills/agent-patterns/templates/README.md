@@ -1,27 +1,44 @@
 # Agent Pattern Templates
 
-This directory contains implementation templates for agent patterns in multiple programming languages.
+This directory contains implementation templates for all agent patterns from Anthropic's "Building Effective Agents" guide.
 
 ## Available Languages
 
-- **Python** - Full async/await support with Anthropic SDK
-- **TypeScript** - Type-safe implementations with generics
-- **C#** - .NET implementations with async/await and optional Semantic Kernel integration
-- **Rust** - Type-safe with compile-time guarantees
-- **Go** - Concurrent implementations with goroutines and channels
-- **Dart** - Flutter-compatible async implementations
-- **C** - Low-level implementations with manual memory management
-- **GenAIScript** - Declarative agent definitions
+- **Python** - Full async/await support with Anthropic SDK ⭐ Complete
+- **TypeScript** - Type-safe implementations with generics ⭐ Complete
+- **C#** - .NET implementations with async/await ⭐ Complete
+- **Rust** - Type-safe with compile-time guarantees ⭐ Complete
+- **Go** - Concurrent implementations with goroutines and channels ⭐ Complete
+- **Dart** - Flutter-compatible async implementations ⭐ Complete
+- **C** - Low-level implementations with manual memory management ⭐ Complete
+- **GenAIScript** - Declarative agent definitions ⭐ Complete
+
+## Template Availability Matrix
+
+| Pattern | Python | TypeScript | C# | Rust | Go | Dart | C | GenAIScript |
+|---------|--------|------------|-----|------|-----|------|---|-------------|
+| Prompt Chaining | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Routing | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Parallelization | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Orchestrator-Workers | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Evaluator-Optimizer | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Autonomous Agents | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Template Structure
 
-Each language directory contains:
+Each language directory contains pattern implementations:
 
-- `prompt_chaining.*` - Sequential LLM calls with validation
-- `orchestrator_workers.*` - Dynamic task decomposition (selected languages)
-- `routing.*` - Classification and specialized routing (coming soon)
-- `evaluator_optimizer.*` - Iterative refinement loops (coming soon)
-- Additional patterns as needed
+### Core Workflow Patterns
+- `prompt_chaining.*` - Sequential LLM calls with validation and checkpoints
+- `routing.*` - Classification and specialized handler routing  
+- `parallelization.*` - Sectioning (parallel subtasks) and Voting (consensus)
+
+### Dynamic Orchestration Patterns
+- `orchestrator_workers.*` - Dynamic task decomposition with specialized workers
+- `autonomous_agent.*` - Open-ended exploration with tool usage and environment feedback
+
+### Iterative Refinement
+- `evaluator_optimizer.*` - Generator + Evaluator feedback loops
 
 ## Usage
 
@@ -76,25 +93,47 @@ dart run prompt_chaining.dart
 ## Pattern Implementations
 
 ### 1. Prompt Chaining
-
-All languages include:
+Sequential LLM calls with programmatic checkpoints. Available in all languages:
 - Step definition with validators
 - Context passing between steps
 - Execution history tracking
 - Error handling
 - Type safety (where applicable)
 
-### 2. Orchestrator-Workers
+### 2. Routing
+Classification and specialized handler routing:
+- Input classification with confidence scores
+- Multiple specialized handlers per route
+- Model-based routing (route to different models by complexity)
+- Fallback handling for unclassified inputs
 
-Python, TypeScript, and C# include full implementations showing:
-- Dynamic subtask planning
-- Parallel worker execution
-- Result synthesis
-- Worker specialization
+### 3. Parallelization
+Concurrent execution patterns:
+- **Sectioning**: Split task into independent parallel subtasks
+- **Voting**: Run same task multiple times for consensus
+- **Guardrails**: Run safety checks in parallel with main task
 
-### 3. Other Patterns
+### 4. Orchestrator-Workers
+Dynamic task decomposition:
+- Central orchestrator plans subtasks dynamically
+- Specialized workers execute in parallel
+- Result synthesis into coherent output
+- Worker type registration and specialization
 
-Additional patterns can be generated on-demand using the agent-patterns skill.
+### 5. Evaluator-Optimizer
+Iterative refinement loops:
+- Separate generator and evaluator roles
+- Configurable evaluation criteria with weights
+- Stopping conditions (score threshold, no improvement, max iterations)
+- Confidence-based optimization variant
+
+### 6. Autonomous Agents
+Open-ended exploration with tool usage:
+- Tool registration and execution
+- Environment feedback loop
+- Multiple stopping conditions
+- Action history tracking
+- Sandboxed execution patterns
 
 ## Environment Setup
 
