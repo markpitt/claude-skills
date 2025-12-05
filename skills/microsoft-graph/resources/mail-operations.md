@@ -1,12 +1,18 @@
-# Mail - Microsoft Graph API
+# Mail Operations - Microsoft Graph API
 
-This resource covers all endpoints related to email, messages, mailboxes, and mail management.
+This resource covers all endpoints related to email, messages, mailboxes, email management, attachments, and mail organization.
 
 ## Base Endpoints
 
 - Messages: `https://graph.microsoft.com/v1.0/me/messages`
 - Mail Folders: `https://graph.microsoft.com/v1.0/me/mailFolders`
 - Send Mail: `https://graph.microsoft.com/v1.0/me/sendMail`
+- Calendar: `https://graph.microsoft.com/v1.0/me/calendar`
+- Events: `https://graph.microsoft.com/v1.0/me/events`
+
+---
+
+# Email Operations
 
 ## Messages
 
@@ -226,6 +232,7 @@ Content-Type: application/json
 ```
 
 ### Add Large Attachment (> 3 MB)
+
 Use upload sessions for files > 3 MB:
 
 ```http
@@ -468,37 +475,45 @@ Content-Type: application/json
 
 ---
 
-## Message Properties
+## Categories
 
-### Core Properties
-- `id` - Message ID
-- `subject` - Subject
-- `body` - Message body (contentType: Text or HTML)
-- `bodyPreview` - First 255 characters
-- `from` - Sender
-- `toRecipients` - To recipients (array)
-- `ccRecipients` - CC recipients (array)
-- `bccRecipients` - BCC recipients (array)
-- `replyTo` - Reply-to addresses
-- `receivedDateTime` - Received date/time
-- `sentDateTime` - Sent date/time
-- `hasAttachments` - Has attachments (boolean)
-- `importance` - low, normal, high
-- `isRead` - Read status
-- `isDraft` - Draft status
-- `categories` - Categories (array)
-- `conversationId` - Conversation ID
-- `parentFolderId` - Parent folder ID
-- `webLink` - Web link to message
-
-### Extended Properties
+### List Categories
 ```http
-GET /me/messages/{id}?$expand=extensions
+GET /me/outlook/masterCategories
+```
+
+### Create Category
+```http
+POST /me/outlook/masterCategories
+Content-Type: application/json
+
+{
+  "displayName": "Project X",
+  "color": "preset2"
+}
+```
+
+**Preset colors:** `preset0` through `preset24`
+
+### Update Category
+```http
+PATCH /me/outlook/masterCategories/{category-id}
+Content-Type: application/json
+
+{
+  "displayName": "Project X - Completed",
+  "color": "preset5"
+}
+```
+
+### Delete Category
+```http
+DELETE /me/outlook/masterCategories/{category-id}
 ```
 
 ---
 
-## Advanced Queries
+## Message Search & Filtering
 
 ### Search Messages
 ```http
@@ -552,156 +567,3 @@ GET {deltaLink}
 
 ---
 
-## Categories
-
-### List Categories
-```http
-GET /me/outlook/masterCategories
-```
-
-### Create Category
-```http
-POST /me/outlook/masterCategories
-Content-Type: application/json
-
-{
-  "displayName": "Project X",
-  "color": "preset2"
-}
-```
-
-**Preset colors:** `preset0` through `preset24`
-
-### Update Category
-```http
-PATCH /me/outlook/masterCategories/{category-id}
-Content-Type: application/json
-
-{
-  "displayName": "Project X - Completed",
-  "color": "preset5"
-}
-```
-
-### Delete Category
-```http
-DELETE /me/outlook/masterCategories/{category-id}
-```
-
----
-
-## Mailbox Settings
-
-### Get All Settings
-```http
-GET /me/mailboxSettings
-```
-
-### Get Specific Settings
-```http
-GET /me/mailboxSettings/timeZone
-GET /me/mailboxSettings/language
-GET /me/mailboxSettings/dateFormat
-GET /me/mailboxSettings/timeFormat
-```
-
-### Update Settings
-```http
-PATCH /me/mailboxSettings
-Content-Type: application/json
-
-{
-  "timeZone": "Pacific Standard Time",
-  "language": {
-    "locale": "en-US"
-  },
-  "dateFormat": "MM/dd/yyyy",
-  "timeFormat": "hh:mm tt"
-}
-```
-
----
-
-## Permissions Reference
-
-### Delegated Permissions
-- `Mail.Read` - Read user mail
-- `Mail.ReadWrite` - Read and write user mail
-- `Mail.Read.Shared` - Read shared mail
-- `Mail.ReadWrite.Shared` - Read and write shared mail
-- `Mail.Send` - Send mail as user
-- `Mail.Send.Shared` - Send mail on behalf of others
-- `MailboxSettings.Read` - Read mailbox settings
-- `MailboxSettings.ReadWrite` - Read and write mailbox settings
-
-### Application Permissions
-- `Mail.Read` - Read mail in all mailboxes
-- `Mail.ReadWrite` - Read and write mail in all mailboxes
-- `Mail.Send` - Send mail as any user
-- `MailboxSettings.Read` - Read all mailbox settings
-- `MailboxSettings.ReadWrite` - Read and write all mailbox settings
-
----
-
-## Common Patterns
-
-### Get Unread Inbox Count
-```http
-GET /me/mailFolders/inbox?$select=unreadItemCount
-```
-
-### Mark All as Read
-Use batch request:
-```http
-POST /$batch
-Content-Type: application/json
-
-{
-  "requests": [
-    {"id": "1", "method": "PATCH", "url": "/me/messages/{id1}", "body": {"isRead": true}},
-    {"id": "2", "method": "PATCH", "url": "/me/messages/{id2}", "body": {"isRead": true}}
-  ]
-}
-```
-
-### Send Email with High Priority
-```http
-POST /me/sendMail
-{
-  "message": {
-    "subject": "Urgent",
-    "importance": "high",
-    "body": {"contentType": "Text", "content": "Urgent matter"},
-    "toRecipients": [{"emailAddress": {"address": "urgent@example.com"}}]
-  }
-}
-```
-
-### Get Today's Messages
-```http
-GET /me/messages?$filter=receivedDateTime ge {today-start} and receivedDateTime lt {today-end}
-```
-
----
-
-## Best Practices
-
-1. **Use $select** to get only needed properties
-2. **Implement pagination** - messages can be large datasets
-3. **Use delta queries** for mail sync scenarios
-4. **Batch operations** when updating multiple messages
-5. **Handle large attachments** with upload sessions (> 3 MB)
-6. **Respect rate limits** - implement retry logic
-7. **Use search** instead of client-side filtering
-8. **Cache folder IDs** to avoid repeated lookups
-9. **Handle encoding** properly for attachment content
-10. **Use well-known folder names** when possible (inbox, drafts, etc.)
-
----
-
-## Rate Limits
-
-- Typical limit: 10,000 requests per 10 minutes per user
-- Send mail: Lower limits apply
-- Attachment uploads: Separate limits
-- Monitor `Retry-After` header on 429 responses

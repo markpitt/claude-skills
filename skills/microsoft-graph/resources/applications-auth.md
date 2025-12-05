@@ -1,12 +1,21 @@
-# Applications - Microsoft Graph API
+# Applications & Authentication - Microsoft Graph API
 
-This resource covers app registrations, service principals, OAuth2 permissions, and application management in Azure AD.
+This resource covers app registrations, service principals, OAuth2 permissions, authentication methods, and credentials management in Azure AD.
 
 ## Base Endpoints
 
 - Applications: `https://graph.microsoft.com/v1.0/applications`
 - Service Principals: `https://graph.microsoft.com/v1.0/servicePrincipals`
 - OAuth2 Permissions: `https://graph.microsoft.com/v1.0/oauth2PermissionGrants`
+- Authentication Methods: `https://graph.microsoft.com/v1.0/users/{id}/authentication`
+
+## Overview
+
+Authentication in Microsoft Graph follows OAuth 2.0 standards:
+1. App registers in Azure AD
+2. User grants permissions (delegated) or app gets permissions (application)
+3. Access token obtained
+4. Token used in API calls
 
 ## Applications
 
@@ -279,12 +288,14 @@ DELETE /oauth2PermissionGrants/{grant-id}
 
 ## Application Credentials
 
+Credentials secure your application authentication to Microsoft Graph.
+
 ### List Password Credentials
 ```http
 GET /applications/{id}?$select=passwordCredentials
 ```
 
-### Add Password Credential
+### Add Password Credential (Client Secret)
 ```http
 POST /applications/{id}/addPassword
 {
@@ -294,7 +305,7 @@ POST /applications/{id}/addPassword
 }
 ```
 
-**Returns:** New secret (store immediately - cannot retrieve later)
+**Returns:** New secret value (store immediately - cannot retrieve later)
 
 ### Remove Password Credential
 ```http
@@ -320,6 +331,28 @@ POST /applications/{id}/addKey
   },
   "passwordCredential": null,
   "proof": "{proof-token}"
+}
+```
+
+---
+
+## Federated Identity Credentials
+
+Use for workload identity federation (GitHub Actions, Kubernetes, etc.) - no secrets needed.
+
+### List Federated Credentials
+```http
+GET /applications/{id}/federatedIdentityCredentials
+```
+
+### Add Federated Credential
+```http
+POST /applications/{id}/federatedIdentityCredentials
+{
+  "name": "GitHubActions",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:org/repo:environment:Production",
+  "audiences": ["api://AzureADTokenExchange"]
 }
 ```
 
@@ -410,25 +443,84 @@ POST /policies/homeRealmDiscoveryPolicies
 
 ---
 
-## Federated Identity Credentials
+## Authentication Methods
 
-### List Federated Credentials
+Authentication methods allow users to sign in.
+
+### List User's Authentication Methods
 ```http
-GET /applications/{id}/federatedIdentityCredentials
+GET /users/{user-id}/authentication/methods
 ```
 
-### Add Federated Credential
+### Phone Authentication
+
+#### List Phone Methods
 ```http
-POST /applications/{id}/federatedIdentityCredentials
+GET /users/{user-id}/authentication/phoneMethods
+```
+
+#### Add Phone Method
+```http
+POST /users/{user-id}/authentication/phoneMethods
 {
-  "name": "GitHubActions",
-  "issuer": "https://token.actions.githubusercontent.com",
-  "subject": "repo:org/repo:environment:Production",
-  "audiences": ["api://AzureADTokenExchange"]
+  "phoneNumber": "+1 555-0100",
+  "phoneType": "mobile"
 }
 ```
 
-Use for workload identity federation (GitHub Actions, Kubernetes, etc.)
+**Phone types:** `mobile`, `alternateMobile`, `office`
+
+### Email Authentication
+
+#### Get Email Methods
+```http
+GET /users/{user-id}/authentication/emailMethods
+```
+
+#### Add Email Method
+```http
+POST /users/{user-id}/authentication/emailMethods
+{
+  "emailAddress": "backup@example.com"
+}
+```
+
+### FIDO2 Security Keys
+
+#### List FIDO2 Methods
+```http
+GET /users/{user-id}/authentication/fido2Methods
+```
+
+### Microsoft Authenticator
+
+#### List Authenticator Methods
+```http
+GET /users/{user-id}/authentication/microsoftAuthenticatorMethods
+```
+
+### Temporary Access Pass (TAP)
+
+#### Create TAP
+```http
+POST /users/{user-id}/authentication/temporaryAccessPassMethods
+{
+  "lifetimeInMinutes": 60,
+  "isUsableOnce": true
+}
+```
+
+**Returns:** One-time password for passwordless onboarding
+
+### Password Methods
+
+#### Reset Password
+```http
+POST /users/{user-id}/authentication/passwordMethods/{method-id}/resetPassword
+{
+  "newPassword": "NewP@ssw0rd!"
+}
+```
 
 ---
 
@@ -530,6 +622,24 @@ POST /applications/{id}/removePassword
 {...}
 ```
 
+### Setup Federated Identity (GitHub Actions)
+```http
+# 1. Register application
+POST /applications
+{...}
+
+# 2. Add federated credential
+POST /applications/{id}/federatedIdentityCredentials
+{
+  "name": "GitHubActions",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:org/repo:ref:refs/heads/main",
+  "audiences": ["api://AzureADTokenExchange"]
+}
+
+# 3. Use in GitHub Actions workflow (no secrets needed)
+```
+
 ---
 
 ## Best Practices
@@ -537,10 +647,22 @@ POST /applications/{id}/removePassword
 1. **Use managed identities** when possible (Azure resources)
 2. **Rotate secrets regularly** (every 90 days recommended)
 3. **Use certificates** instead of secrets for production
-4. **Request least privilege** permissions
-5. **Use workload identity federation** for CI/CD
-6. **Monitor consent grants** regularly
-7. **Document custom app roles** clearly
-8. **Use schema extensions** sparingly
+4. **Use federated identities** for CI/CD (no secrets)
+5. **Request least privilege** permissions
+6. **Use workload identity federation** for external systems
+7. **Monitor consent grants** regularly
+8. **Document custom app roles** clearly
 9. **Implement proper token caching**
 10. **Test multi-tenant apps** in multiple tenants
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| 401 Invalid token | Check token expiration, request new token |
+| 403 Permission denied | Verify app has required permissions in Azure AD |
+| App not found | Verify appId/application object ID is correct |
+| Credential expired | Renew password/certificate credentials |
+| Cannot add secret | Verify you have Application.ReadWrite.All |

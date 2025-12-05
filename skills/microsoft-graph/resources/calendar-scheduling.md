@@ -1,12 +1,16 @@
-# Calendar - Microsoft Graph API
+# Calendar & Scheduling - Microsoft Graph API
 
-This resource covers all endpoints related to calendars, events, scheduling, and meeting management.
+This resource covers all endpoints related to calendar events, meeting scheduling, attendee management, and calendar operations.
 
 ## Base Endpoints
 
 - Calendar: `https://graph.microsoft.com/v1.0/me/calendar`
 - Events: `https://graph.microsoft.com/v1.0/me/events`
-- Calendar Groups: `https://graph.microsoft.com/v1.0/me/calendarGroups`
+- OnlineMeetings: `https://graph.microsoft.com/v1.0/me/onlineMeetings`
+
+---
+
+# Calendar Operations
 
 ## Events
 
@@ -366,30 +370,6 @@ DELETE /me/calendars/{calendar-id}
 
 ---
 
-## Calendar Groups
-
-### List Calendar Groups
-```http
-GET /me/calendarGroups
-```
-
-### Create Calendar Group
-```http
-POST /me/calendarGroups
-Content-Type: application/json
-
-{
-  "name": "Personal Calendars"
-}
-```
-
-### List Calendars in Group
-```http
-GET /me/calendarGroups/{group-id}/calendars
-```
-
----
-
 ## Free/Busy Schedule
 
 ### Get Schedule
@@ -441,14 +421,7 @@ GET /me/findRoomLists
 ```
 
 ### Get Room Availability
-Include room email in getSchedule request:
-```http
-POST /me/calendar/getSchedule
-{
-  "schedules": ["conferenceroom@example.com"],
-  ...
-}
-```
+Include room email in getSchedule request.
 
 ---
 
@@ -539,87 +512,33 @@ Content-Type: application/json
 
 ---
 
-## Event Properties
+## Mailbox Settings
 
-### Core Properties
-- `id` - Event ID
-- `subject` - Event title
-- `body` - Event description (HTML or text)
-- `start` - Start time (dateTime + timeZone)
-- `end` - End time (dateTime + timeZone)
-- `location` - Location object
-- `locations` - Multiple locations (array)
-- `attendees` - Attendees (array)
-- `organizer` - Organizer
-- `isAllDay` - All-day event flag
-- `isCancelled` - Cancelled flag
-- `isOrganizer` - Current user is organizer
-- `responseRequested` - Response requested
-- `sensitivity` - normal, personal, private, confidential
-- `showAs` - free, tentative, busy, oof, workingElsewhere, unknown
-- `categories` - Categories (array)
-- `importance` - low, normal, high
-- `webLink` - Web link to event
-
-### Time Zone Properties
-```json
-{
-  "start": {
-    "dateTime": "2024-01-15T14:00:00",
-    "timeZone": "Pacific Standard Time"
-  }
-}
-```
-
-**Use IANA or Windows time zone identifiers**
-
----
-
-## Reminders
-
-### Event Reminders
-```json
-{
-  "reminderMinutesBeforeStart": 15,
-  "isReminderOn": true
-}
-```
-
-### Default Reminder Settings
+### Get All Settings
 ```http
 GET /me/mailboxSettings
-
-{
-  "automaticRepliesSetting": {...},
-  "timeZone": "Pacific Standard Time",
-  "language": {...},
-  "workingHours": {...}
-}
 ```
 
----
-
-## Working Hours
-
-### Get Working Hours
+### Get Specific Settings
 ```http
-GET /me/mailboxSettings/workingHours
+GET /me/mailboxSettings/timeZone
+GET /me/mailboxSettings/language
+GET /me/mailboxSettings/dateFormat
+GET /me/mailboxSettings/timeFormat
 ```
 
-### Set Working Hours
+### Update Settings
 ```http
 PATCH /me/mailboxSettings
 Content-Type: application/json
 
 {
-  "workingHours": {
-    "daysOfWeek": ["monday", "tuesday", "wednesday", "thursday", "friday"],
-    "startTime": "08:00:00",
-    "endTime": "17:00:00",
-    "timeZone": {
-      "name": "Pacific Standard Time"
-    }
-  }
+  "timeZone": "Pacific Standard Time",
+  "language": {
+    "locale": "en-US"
+  },
+  "dateFormat": "MM/dd/yyyy",
+  "timeFormat": "hh:mm tt"
 }
 ```
 
@@ -628,22 +547,26 @@ Content-Type: application/json
 ## Permissions Reference
 
 ### Delegated Permissions
+- `Mail.Read` - Read user mail
+- `Mail.ReadWrite` - Read and write user mail
+- `Mail.Send` - Send mail as user
 - `Calendars.Read` - Read user calendars
 - `Calendars.ReadWrite` - Read and write user calendars
-- `Calendars.Read.Shared` - Read shared calendars
-- `Calendars.ReadWrite.Shared` - Read and write shared calendars
 
 ### Application Permissions
+- `Mail.Read` - Read mail in all mailboxes
+- `Mail.ReadWrite` - Read and write mail in all mailboxes
+- `Mail.Send` - Send mail as any user
 - `Calendars.Read` - Read calendars in all mailboxes
-- `Calendars.ReadWrite` - Read and write calendars in all mailboxes
+- `Calendars.ReadWrite` - Read and write calendars
 
 ---
 
 ## Common Patterns
 
-### Get Today's Events
+### Get Today's Messages
 ```http
-GET /me/calendar/calendarView?startDateTime={today-start}&endDateTime={today-end}
+GET /me/messages?$filter=receivedDateTime ge {today-start} and receivedDateTime lt {today-end}
 ```
 
 ### Get This Week's Events
@@ -668,12 +591,19 @@ POST /me/events
 }
 ```
 
-### Add Teams Meeting to Event
+### Mark All as Read
+Use batch request to update multiple messages.
+
+### Send Email with High Priority
 ```http
-PATCH /me/events/{event-id}
+POST /me/sendMail
 {
-  "isOnlineMeeting": true,
-  "onlineMeetingProvider": "teamsForBusiness"
+  "message": {
+    "subject": "Urgent",
+    "importance": "high",
+    "body": {"contentType": "Text", "content": "Urgent matter"},
+    "toRecipients": [{"emailAddress": {"address": "urgent@example.com"}}]
+  }
 }
 ```
 
@@ -681,29 +611,23 @@ PATCH /me/events/{event-id}
 
 ## Best Practices
 
-1. **Use calendarView** instead of filtering events for date ranges
-2. **Specify time zones** explicitly in start/end times
-3. **Handle recurring events** properly (use instances endpoint)
-4. **Respect working hours** when scheduling
-5. **Check availability** before creating meetings (getSchedule)
-6. **Use findMeetingTimes** for complex scheduling
-7. **Include meeting locations** for better UX
-8. **Set appropriate reminders**
-9. **Handle time zone conversions** on client side
-10. **Use delta queries** for calendar sync scenarios
+**Email:**
+1. Use `$select` to get only needed properties
+2. Implement pagination for large message sets
+3. Use delta queries for mail sync
+4. Batch operations when updating multiple messages
+5. Handle large attachments with upload sessions
 
----
+**Calendar:**
+1. Use `calendarView` instead of filtering for date ranges
+2. Specify time zones explicitly
+3. Handle recurring events properly
+4. Use `findMeetingTimes` for complex scheduling
+5. Respect working hours when scheduling
 
-## Delta Queries
-
-### Initial Request
-```http
-GET /me/calendar/events/delta
-```
-
-### Subsequent Requests
-```http
-GET {deltaLink}
-```
-
-Use delta queries to efficiently sync calendar changes.
+**Combined:**
+1. Cache folder IDs to avoid repeated lookups
+2. Respect rate limits (implement retry logic)
+3. Handle encoding properly for attachment content
+4. Use well-known folder names when possible
+5. Monitor Retry-After header on 429 responses
