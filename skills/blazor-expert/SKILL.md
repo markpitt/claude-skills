@@ -1,639 +1,260 @@
 ---
 name: blazor-expert
 description: Comprehensive Blazor development expertise covering Blazor Server, WebAssembly, and Hybrid apps. Use when building Blazor components, implementing state management, handling routing, JavaScript interop, forms and validation, authentication, or optimizing Blazor applications. Includes best practices, architecture patterns, and troubleshooting guidance.
-version: 1.0
+version: 2.0
 ---
 
-# Blazor Expert
+# Blazor Expert - Orchestration Hub
 
 Expert-level guidance for developing applications with Blazor, Microsoft's framework for building interactive web UIs using C# instead of JavaScript.
 
-## Blazor Hosting Models
+## Quick Reference: When to Load Which Resource
+
+| Task | Load Resource | Key Topics |
+|------|---------------|-----------|
+| **Build components, handle lifecycle events** | [components-lifecycle.md](resources/components-lifecycle.md) | Component structure, lifecycle methods, parameters, cascading values, RenderFragment composition |
+| **Manage component state, handle events** | [state-management-events.md](resources/state-management-events.md) | Local state, EventCallback, data binding, cascading state, service-based state |
+| **Configure routes, navigate between pages** | [routing-navigation.md](resources/routing-navigation.md) | Route parameters, constraints, navigation, NavLink, query strings, layouts |
+| **Build forms, validate user input** | [forms-validation.md](resources/forms-validation.md) | EditForm, input components, DataAnnotations validation, custom validators |
+| **Setup authentication & authorization** | [authentication-authorization.md](resources/authentication-authorization.md) | Auth setup, AuthorizeView, Authorize attribute, policies, claims |
+| **Optimize performance, use JavaScript interop** | [performance-advanced.md](resources/performance-advanced.md) | Rendering optimization, virtualization, JS interop, lazy loading, WASM best practices |
+
+## Orchestration Protocol
+
+### Phase 1: Task Analysis
+
+Identify your primary objective:
+- **UI Building** → Load components-lifecycle.md
+- **State Handling** → Load state-management-events.md
+- **Navigation** → Load routing-navigation.md
+- **Data Input** → Load forms-validation.md
+- **User Access** → Load authentication-authorization.md
+- **Speed/Efficiency** → Load performance-advanced.md
+
+### Phase 2: Resource Loading
+
+Open the recommended resource file(s) and search for your specific need using Ctrl+F. Each resource is organized by topic with working code examples.
+
+### Phase 3: Implementation & Validation
+
+- Follow code patterns from the resource
+- Adapt to your specific requirements
+- Test in appropriate hosting model (Server/WASM/Hybrid)
+- Review troubleshooting section if issues arise
+
+## Blazor Hosting Models Overview
 
 ### Blazor Server
-- **Execution**: Runs on the server via SignalR connection
-- **Advantages**: Small download size, full .NET runtime, works on older browsers
-- **Disadvantages**: Higher latency, requires constant connection, server resource intensive
-- **Use when**: Building line-of-business apps, need full .NET features, prioritize initial load time
+- **How**: Runs on server via SignalR
+- **Best For**: Line-of-business apps, need full .NET runtime, small download size
+- **Trade-offs**: High latency, requires connection, server resource intensive
 
-### Blazor WebAssembly (WASM)
-- **Execution**: Runs entirely in browser via WebAssembly
-- **Advantages**: Offline capability, no server dependency after load, reduced server costs
-- **Disadvantages**: Larger initial download, limited .NET APIs, slower cold start
-- **Use when**: Building PWAs, offline-first apps, client-heavy applications
+### Blazor WebAssembly
+- **How**: Runs in browser via WebAssembly
+- **Best For**: PWAs, offline apps, no server dependency, client-heavy applications
+- **Trade-offs**: Large initial download, limited .NET APIs, slower cold start
 
 ### Blazor Hybrid
-- **Execution**: Runs in native mobile/desktop apps (MAUI, WPF, WinForms)
-- **Advantages**: Full platform access, native performance, code sharing
-- **Use when**: Building cross-platform desktop/mobile apps with Blazor UI
-
-## Component Development
-
-### Component Structure
-```csharp
-@page "/example"
-@using MyApp.Services
-@inject IMyService MyService
-
-<h3>@Title</h3>
-<div>@ChildContent</div>
-
-@code {
-    [Parameter]
-    public string Title { get; set; } = "Default";
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        // Initialization logic
-    }
-}
-```
-
-### Component Lifecycle Methods
-1. **SetParametersAsync**: First method called, parameters set
-2. **OnInitialized/OnInitializedAsync**: Component initialized, runs once
-3. **OnParametersSet/OnParametersSetAsync**: After parameters set, runs on each render
-4. **OnAfterRender/OnAfterRenderAsync**: After component rendered (UI updated)
-   - Use `firstRender` parameter for one-time JS interop initialization
-
-### Parameter Best Practices
-- Use `[Parameter]` attribute for component parameters
-- Use `[CascadingParameter]` for values from ancestor components
-- Mark optional parameters with nullable types or default values
-- Use `[EditorRequired]` for required parameters (C# 11+)
-- Use `EventCallback<T>` for child-to-parent communication
-
-```csharp
-[Parameter, EditorRequired]
-public string RequiredId { get; set; } = default!;
-
-[Parameter]
-public EventCallback<string> OnValueChanged { get; set; }
-
-[CascadingParameter]
-public ThemeInfo? Theme { get; set; }
-```
-
-## State Management
-
-### Component State
-- Use private fields/properties for component-specific state
-- Call `StateHasChanged()` when state updates outside Blazor event handlers
-- Use `InvokeAsync()` for thread-safe state updates
-
-### Cascading Values
-```csharp
-// Provide value to descendant components
-<CascadingValue Value="@currentUser">
-    @ChildContent
-</CascadingValue>
-
-// Receive in child component
-[CascadingParameter]
-public User? CurrentUser { get; set; }
-```
-
-### Service-Based State
-- Register services in Program.cs: `builder.Services.AddScoped<AppState>()`
-- Use scoped services for user-specific state (Blazor Server and WASM)
-- Use singleton services for app-wide state (use with caution in Server)
-- Implement `INotifyPropertyChanged` or events for reactive state
-
-```csharp
-public class AppState
-{
-    private string _username = "";
-    public event Action? OnChange;
-
-    public string Username
-    {
-        get => _username;
-        set
-        {
-            if (_username != value)
-            {
-                _username = value;
-                NotifyStateChanged();
-            }
-        }
-    }
-
-    private void NotifyStateChanged() => OnChange?.Invoke();
-}
-
-// In component
-@implements IDisposable
-@inject AppState AppState
-
-protected override void OnInitialized()
-{
-    AppState.OnChange += StateHasChanged;
-}
-
-public void Dispose()
-{
-    AppState.OnChange -= StateHasChanged;
-}
-```
-
-## Routing and Navigation
-
-### Route Definition
-```csharp
-@page "/product/{Id:int}"
-@page "/product/{Id:int}/details"
-
-@code {
-    [Parameter]
-    public int Id { get; set; }
-}
-```
-
-### Route Constraints
-- `:int`, `:long`, `:guid`, `:bool`, `:datetime`, `:decimal`, `:double`, `:float`
-- Custom constraints via `IRouteConstraint`
-
-### Navigation
-```csharp
-@inject NavigationManager Navigation
-
-// Navigate programmatically
-Navigation.NavigateTo("/target");
-Navigation.NavigateTo("/target", forceLoad: true); // Full page reload
-
-// Listen to location changes
-Navigation.LocationChanged += OnLocationChanged;
-
-// Query strings
-var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-var value = query["paramName"];
-```
-
-### NavLink Component
-```html
-<NavLink href="/counter" Match="NavLinkMatch.All">
-    <span class="icon">🔢</span> Counter
-</NavLink>
-```
-
-## JavaScript Interop
-
-### Call JavaScript from C#
-```csharp
-@inject IJSRuntime JS
-
-// Simple call
-await JS.InvokeVoidAsync("console.log", "Hello from Blazor");
-
-// With return value
-var result = await JS.InvokeAsync<string>("myJsFunction", arg1, arg2);
-
-// Isolate JS modules (recommended)
-var module = await JS.InvokeAsync<IJSObjectReference>(
-    "import", "./scripts/myModule.js");
-await module.InvokeVoidAsync("myFunction");
-```
-
-### Call C# from JavaScript
-```csharp
-// Static method
-[JSInvokable]
-public static Task<string> GetData()
-{
-    return Task.FromResult("Data from C#");
-}
-
-// Instance method
-[JSInvokable]
-public Task DoSomething(string value)
-{
-    // Implementation
-    return Task.CompletedTask;
-}
-
-// Pass DotNetObjectReference to JS
-var objRef = DotNetObjectReference.Create(this);
-await JS.InvokeVoidAsync("setupInterop", objRef);
-
-// In JavaScript:
-// dotnetHelper.invokeMethodAsync('DoSomething', value);
-```
-
-### Best Practices
-- Dispose JS object references: `await module.DisposeAsync()`
-- Use `IJSInProcessRuntime` for synchronous calls (WASM only)
-- Minimize interop calls for performance
-- Use JS isolation for module-scoped code
-
-## Forms and Validation
-
-### EditForm Component
-```csharp
-<EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <InputText @bind-Value="model.Name" />
-    <ValidationMessage For="@(() => model.Name)" />
-
-    <InputNumber @bind-Value="model.Age" />
-    <ValidationMessage For="@(() => model.Age)" />
-
-    <InputSelect @bind-Value="model.Category">
-        <option value="">Select...</option>
-        <option value="A">Category A</option>
-        <option value="B">Category B</option>
-    </InputSelect>
-
-    <button type="submit">Submit</button>
-</EditForm>
-
-@code {
-    private MyModel model = new();
-
-    private async Task HandleValidSubmit()
-    {
-        // Form is valid, process data
-        await SaveData(model);
-    }
-}
-
-public class MyModel
-{
-    [Required]
-    [StringLength(100)]
-    public string Name { get; set; } = "";
-
-    [Range(1, 120)]
-    public int Age { get; set; }
-
-    [Required]
-    public string Category { get; set; } = "";
-}
-```
-
-### Custom Validation
-```csharp
-public class MyModel : IValidatableObject
-{
-    public string Email { get; set; } = "";
-    public string ConfirmEmail { get; set; } = "";
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (Email != ConfirmEmail)
-        {
-            yield return new ValidationResult(
-                "Email addresses must match",
-                new[] { nameof(ConfirmEmail) }
-            );
-        }
-    }
-}
-```
-
-### Input Components
-- `InputText`, `InputTextArea`: Text input
-- `InputNumber<T>`: Numeric input
-- `InputDate<T>`: Date input
-- `InputSelect<T>`: Dropdown selection
-- `InputCheckbox`: Boolean checkbox
-- `InputRadio<T>`, `InputRadioGroup<T>`: Radio buttons
-- `InputFile`: File upload
-
-## Authentication and Authorization
-
-### Setup (Program.cs)
-```csharp
-// Blazor Server
-builder.Services.AddAuthentication(/* options */)
-    .AddCookie(/* cookie options */);
-builder.Services.AddAuthorization();
-
-// Blazor WASM
-builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-```
-
-### AuthorizeView Component
-```html
-<AuthorizeView>
-    <Authorized>
-        <p>Hello, @context.User.Identity?.Name!</p>
-    </Authorized>
-    <NotAuthorized>
-        <p>Please log in.</p>
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Admin">
-    <p>Admin content</p>
-</AuthorizeView>
-
-<AuthorizeView Policy="ContentEditor">
-    <p>Editor content</p>
-</AuthorizeView>
-```
-
-### Page Authorization
-```csharp
-@page "/admin"
-@attribute [Authorize]
-@attribute [Authorize(Roles = "Admin")]
-@attribute [Authorize(Policy = "RequireAdminRole")]
-```
-
-### Access AuthenticationState
-```csharp
-[CascadingParameter]
-private Task<AuthenticationState>? AuthStateTask { get; set; }
-
-protected override async Task OnInitializedAsync()
-{
-    var authState = await AuthStateTask!;
-    var user = authState.User;
-
-    if (user.Identity?.IsAuthenticated == true)
-    {
-        var userName = user.Identity.Name;
-        var isAdmin = user.IsInRole("Admin");
-    }
-}
-```
-
-## Performance Optimization
-
-### Rendering Optimization
-- Override `ShouldRender()` to prevent unnecessary renders
-- Use `@key` directive for list items to help diffing algorithm
-- Implement `IDisposable` and clean up event handlers
-- Use `StateHasChanged()` judiciously
-
-```csharp
-@foreach (var item in items)
-{
-    <div @key="item.Id">@item.Name</div>
-}
-
-protected override bool ShouldRender()
-{
-    // Return false to skip render
-    return shouldUpdate;
-}
-```
-
-### Virtualization
-```html
-@using Microsoft.AspNetCore.Components.Web.Virtualization
-
-<Virtualize Items="@largeList" Context="item">
-    <div>@item.Name</div>
-</Virtualize>
-
-<!-- Or with ItemsProvider for async loading -->
-<Virtualize ItemsProvider="@LoadItems" Context="item">
-    <div>@item.Name</div>
-</Virtualize>
-
-@code {
-    private async ValueTask<ItemsProviderResult<MyItem>> LoadItems(
-        ItemsProviderRequest request)
-    {
-        var items = await FetchItems(request.StartIndex, request.Count);
-        return new ItemsProviderResult<MyItem>(items, totalCount);
-    }
-}
-```
-
-### Lazy Loading
-```csharp
-// Enable in Router component
-<Router AppAssembly="@typeof(App).Assembly"
-        OnNavigateAsync="@OnNavigateAsync">
-    <Navigating>
-        <p>Loading...</p>
-    </Navigating>
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-    </Found>
-</Router>
-
-@code {
-    private async Task OnNavigateAsync(NavigationContext context)
-    {
-        // Lazy load assemblies if needed
-    }
-}
-```
-
-### WASM Performance
-- Use AOT compilation for production: `<RunAOTCompilation>true</RunAOTCompilation>`
-- Enable trimming: `<PublishTrimmed>true</PublishTrimmed>`
-- Use compression (Brotli/Gzip) on server
-- Implement lazy loading for large apps
-- Minimize JavaScript interop calls
-
-## Best Practices
+- **How**: Runs in MAUI/WPF/WinForms with Blazor UI
+- **Best For**: Cross-platform desktop/mobile apps
+- **Trade-offs**: Platform-specific considerations, additional dependencies
+
+**Decision**: Choose based on deployment environment, offline requirements, and server constraints.
+
+## Common Implementation Workflows
+
+### Scenario 1: Build a Data-Entry Component
+
+1. Read [components-lifecycle.md](resources/components-lifecycle.md) - Component structure section
+2. Read [state-management-events.md](resources/state-management-events.md) - EventCallback pattern
+3. Read [forms-validation.md](resources/forms-validation.md) - EditForm component
+4. Combine: Create component with parameters → capture user input → validate → notify parent
+
+### Scenario 2: Implement User Authentication & Protected Pages
+
+1. Read [authentication-authorization.md](resources/authentication-authorization.md) - Setup section
+2. Read [routing-navigation.md](resources/routing-navigation.md) - Layouts section
+3. Read [authentication-authorization.md](resources/authentication-authorization.md) - AuthorizeView section
+4. Combine: Configure auth → create login page → protect routes → check auth in components
+
+### Scenario 3: Build Interactive List with Search/Filter
+
+1. Read [routing-navigation.md](resources/routing-navigation.md) - Query strings section
+2. Read [state-management-events.md](resources/state-management-events.md) - Data binding section
+3. Read [performance-advanced.md](resources/performance-advanced.md) - Virtualization section
+4. Combine: Capture search input → update URL query → fetch filtered data → virtualize if large
+
+### Scenario 4: Optimize Performance of Existing App
+
+1. Read [performance-advanced.md](resources/performance-advanced.md) - All sections
+2. Identify bottlenecks:
+   - Unnecessary renders? → ShouldRender override, @key directive
+   - Large lists? → Virtualization
+   - JS latency? → Module isolation pattern
+3. Apply targeted optimizations from resource
+
+## Key Blazor Concepts
+
+### Component Architecture
+- **Components**: Self-contained UI units with optional logic
+- **Parameters**: Inputs to components, enable reusability
+- **Cascading Values**: Share state with descendants without explicit parameters
+- **Events**: Child-to-parent communication via EventCallback
+- **Layouts**: Parent wrapper for consistent page structure
+
+### State Management
+- **Local State**: Component-specific fields and properties
+- **Cascading Values**: Share state to descendants
+- **Services**: Application-wide state via dependency injection
+- **Event Binding**: React to user interactions
+- **Data Binding**: Two-way synchronization with UI
+
+### Routing & Navigation
+- **@page Directive**: Make component routable
+- **Route Parameters**: Pass data via URL (`{id:int}`)
+- **Navigation**: Programmatic navigation via NavigationManager
+- **NavLink**: UI component that highlights active route
+- **Layouts**: Wrap pages with common structure
+
+### Forms & Validation
+- **EditForm**: Form component with validation support
+- **Input Components**: Typed controls (InputText, InputNumber, etc.)
+- **Validators**: DataAnnotations attributes or custom logic
+- **EventCallback**: Notify parent of form changes
+- **Messages**: Display validation errors to user
+
+### Authentication & Authorization
+- **Claims & Roles**: Identify users and define access levels
+- **Policies**: Fine-grained authorization rules
+- **Authorize Attribute**: Protect pages from unauthorized access
+- **AuthorizeView**: Conditional rendering based on permissions
+- **AuthenticationStateProvider**: Get current user information
+
+### Performance Optimization
+- **ShouldRender()**: Prevent unnecessary re-renders
+- **@key Directive**: Help diffing algorithm match list items
+- **Virtualization**: Render only visible items in large lists
+- **JS Interop**: Call JavaScript from C# and vice versa
+- **AOT/Trimming**: Reduce WASM download size (production)
+
+## Best Practices Highlights
 
 ### Component Design
-- **Single Responsibility**: Each component should have one clear purpose
-- **Reusability**: Extract common UI patterns into shared components
-- **Composition**: Use RenderFragments for flexible component composition
-- **Parameter Naming**: Use clear, descriptive parameter names
-- **Events**: Use EventCallback for proper async handling
+✅ **Single Responsibility** - Each component has one clear purpose
+✅ **Composition** - Use RenderFragments for flexible layouts
+✅ **Parameter Clarity** - Use descriptive names, mark required with `[EditorRequired]`
+✅ **Proper Disposal** - Implement `IDisposable` to clean up resources
+✅ **Event-Based Communication** - Use `EventCallback` for child-to-parent updates
 
-### Code Organization
-- **Pages vs Components**: Use `@page` directive only for routable pages
-- **Shared Components**: Place in `Shared/` folder
-- **Services**: Keep business logic in injected services, not components
-- **Models**: Define data models in separate files
-- **Constants**: Use static classes or configuration for magic strings
+### State Management
+✅ **EventCallback Over Action** - Proper async handling
+✅ **Immutable Updates** - Create new objects/collections, don't mutate
+✅ **Service-Based State** - Use scoped services for shared state
+✅ **Unsubscribe from Events** - Prevent memory leaks in Dispose
+✅ **InvokeAsync for Background Threads** - Thread-safe state updates
 
-### Error Handling
-```csharp
-// Error boundary
-<ErrorBoundary>
-    <ChildContent>
-        @ChildContent
-    </ChildContent>
-    <ErrorContent Context="exception">
-        <p>An error occurred: @exception.Message</p>
-    </ErrorContent>
-</ErrorBoundary>
+### Routing & Navigation
+✅ **Route Constraints** - Use `:int`, `:guid`, etc. to validate formats
+✅ **NavLink Component** - Automatic active state highlighting
+✅ **forceLoad After Logout** - Clear client-side state
+✅ **ReturnUrl Pattern** - Redirect back after login
+✅ **Query Strings** - Preserve filters/pagination across navigation
 
-// Try-catch in components
-@code {
-    private string? errorMessage;
+### Forms & Validation
+✅ **EditForm + DataAnnotationsValidator** - Built-in validation
+✅ **ValidationMessage** - Show field-level errors
+✅ **Custom Validators** - Extend for complex rules
+✅ **Async Validation** - Check server availability before submit
+✅ **Loading State** - Disable submit button while processing
 
-    private async Task LoadData()
-    {
-        try
-        {
-            await DataService.GetData();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error loading data: {ex.Message}";
-            Logger.LogError(ex, "Error loading data");
-        }
-    }
-}
-```
+### Authentication & Authorization
+✅ **Server Validation** - Never trust client-side checks alone
+✅ **Policies Over Roles** - More flexible authorization rules
+✅ **Claims for Details** - Store user attributes in claims
+✅ **Cascading AuthenticationState** - Available in all components
+✅ **Error Boundaries** - Graceful error handling
 
-### Dependency Injection Lifetimes
-- **Transient**: New instance every time (rare in Blazor)
-- **Scoped**: Instance per circuit/user session (recommended for most services)
-- **Singleton**: Single instance for all users (use carefully, especially in Server)
+### Performance
+✅ **@key on Lists** - Optimize item matching
+✅ **ShouldRender Override** - Prevent unnecessary renders
+✅ **Virtualization for Large Lists** - Only render visible items
+✅ **JS Module Isolation** - Load and cache JS modules efficiently
+✅ **AOT for WASM** - Production deployments
 
-### CSS Isolation
-```html
-<!-- Component: MyComponent.razor -->
-<div class="container">
-    <h1>Title</h1>
-</div>
+## Common Troubleshooting
 
-<!-- MyComponent.razor.css -->
-/* Scoped to this component only */
-.container {
-    background: blue;
-}
+### Component Not Re-rendering
+- **Cause**: Mutation instead of reassignment
+- **Fix**: Create new object/collection: `items = items.Append(item).ToList()`
+- **Or**: Call `StateHasChanged()` manually
 
-h1 {
-    color: white;
-}
-```
+### Parameter Not Updating
+- **Cause**: Parent not re-rendering or same object reference
+- **Fix**: Parent must re-render, ensure new reference for objects
+- **Debug**: Check OnParametersSet is firing
 
-## Common Patterns
+### JS Interop Errors
+- **Cause**: Called before script loaded or wrong function name
+- **Fix**: Use `firstRender` check, verify JS file path
+- **Pattern**: Use module isolation: `await JS.InvokeAsync("import", "./script.js")`
 
-### Loading State
-```csharp
-@if (isLoading)
-{
-    <p>Loading...</p>
-}
-else if (error != null)
-{
-    <p class="error">@error</p>
-}
-else if (data != null)
-{
-    <DisplayData Data="@data" />
-}
-```
+### Authentication State Not Available
+- **Cause**: Cascading parameter not provided or timing issue
+- **Fix**: Ensure AuthenticationStateProvider configured
+- **Pattern**: Always null-check and use `await AuthStateTask!` in code block
 
-### Debouncing Input
-```csharp
-<input @bind="searchTerm" @bind:event="oninput" />
+### Large List Performance Issues
+- **Cause**: Rendering all items in DOM
+- **Fix**: Use Virtualize component for 1000+ items
+- **Alternative**: Paginate with buttons/infinite scroll
 
-@code {
-    private string searchTerm = "";
-    private Timer? debounceTimer;
+### Blazor Server Connection Issues
+- **Cause**: SignalR connection dropped or configuration issue
+- **Fix**: Implement reconnection UI, increase timeout
+- **Config**: Adjust `CircuitOptions.DisconnectedCircuitRetentionPeriod`
 
-    private string SearchTerm
-    {
-        get => searchTerm;
-        set
-        {
-            searchTerm = value;
-            debounceTimer?.Dispose();
-            debounceTimer = new Timer(PerformSearch, null, 300, Timeout.Infinite);
-        }
-    }
+## Resource Files Summary
 
-    private void PerformSearch(object? state)
-    {
-        InvokeAsync(async () =>
-        {
-            await SearchAsync(searchTerm);
-            StateHasChanged();
-        });
-    }
-}
-```
+### components-lifecycle.md
+Complete guide to component structure, lifecycle methods, parameters, cascading values, and composition patterns. Essential for understanding Blazor component fundamentals.
 
-### Confirmation Dialog
-```csharp
-<button @onclick="DeleteWithConfirmation">Delete</button>
+### state-management-events.md
+Comprehensive coverage of local and service-based state, event handling with EventCallback, data binding patterns, and component communication. Core for interactive UI building.
 
-@if (showConfirmation)
-{
-    <div class="modal">
-        <p>Are you sure?</p>
-        <button @onclick="ConfirmDelete">Yes</button>
-        <button @onclick="CancelDelete">No</button>
-    </div>
-}
+### routing-navigation.md
+Complete routing reference including route parameters, constraints, programmatic navigation, query strings, and layout management. Essential for multi-page apps.
 
-@code {
-    private bool showConfirmation;
+### forms-validation.md
+Full forms API with EditForm component, input controls, DataAnnotations validation, custom validators, and form patterns. Required for data entry scenarios.
 
-    private void DeleteWithConfirmation()
-    {
-        showConfirmation = true;
-    }
+### authentication-authorization.md
+Complete auth setup for Server and WASM, AuthorizeView, policies, claims-based access control, and login/logout patterns. Necessary for secured applications.
 
-    private async Task ConfirmDelete()
-    {
-        showConfirmation = false;
-        await PerformDelete();
-    }
+### performance-advanced.md
+Performance optimization techniques including ShouldRender, virtualization, JavaScript interop patterns, lazy loading, and WASM best practices. Vital for production apps.
 
-    private void CancelDelete()
-    {
-        showConfirmation = false;
-    }
-}
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Circuit/Connection Lost (Blazor Server)**
-- Implement reconnection UI
-- Handle `OnCircuitClosed` event
-- Increase timeout: `services.AddServerSideBlazor().AddCircuitOptions(o => o.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3))`
-
-**WASM Load Time**
-- Enable compression, use AOT compilation, implement lazy loading
-- Consider Blazor Server for faster initial load
-
-**StateHasChanged Not Working**
-- Ensure called within `InvokeAsync()` when updating from background thread
-- Check component lifecycle (may not be initialized)
-
-**JavaScript Interop Errors**
-- Call JS only in `OnAfterRender` with `firstRender` check
-- Ensure JS libraries loaded before calling
-- Check browser console for JS errors
-
-**Parameter Not Updating**
-- Parameters only update on parent re-render
-- Use `OnParametersSet` to react to parameter changes
-- Check parent is passing new reference (not mutating object)
+---
 
 ## Implementation Approach
 
 When implementing Blazor features:
 
-1. **Choose hosting model** based on requirements (Server/WASM/Hybrid)
-2. **Design component hierarchy** - identify reusable components
-3. **Define data flow** - parameters down, events up
-4. **Implement state management** - component state, cascading values, or services
-5. **Add validation** - use DataAnnotations and EditForm
-6. **Handle errors** - ErrorBoundary and try-catch patterns
-7. **Optimize** - virtualization, lazy loading, rendering optimization
-8. **Test** - unit tests with bUnit, integration tests
+1. **Identify Your Task** - Match against the decision table above
+2. **Load Relevant Resource** - Read the appropriate .md file
+3. **Find Code Example** - Search resource for similar implementation
+4. **Adapt to Your Context** - Modify for your specific requirements
+5. **Test Thoroughly** - Verify in your hosting model
+6. **Reference Troubleshooting** - Consult resource if issues arise
 
-## Resources Reference
+## Next Steps
 
-For detailed documentation, refer to:
-- Microsoft Blazor documentation
-- Component API reference
-- Blazor hosting models comparison
-- Performance best practices guides
+- **New to Blazor?** Start with [components-lifecycle.md](resources/components-lifecycle.md)
+- **Building Data App?** Move through: components → state → forms → validation
+- **Scaling Existing App?** Focus on [performance-advanced.md](resources/performance-advanced.md)
+- **Adding Security?** Follow [authentication-authorization.md](resources/authentication-authorization.md)
+
+---
+
+**Version**: 2.0 - Modular Orchestration Pattern  
+**Last Updated**: December 4, 2025  
+**Status**: Production Ready ✅
