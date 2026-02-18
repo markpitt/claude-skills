@@ -35,6 +35,7 @@ This repository contains **modular AI skills** organized using an **orchestratio
 | Skill | Resources | Description |
 |---|---|---|
 | [agent-patterns](agent-patterns/SKILL.md) | 7 files | AI agent workflows and orchestration patterns |
+| [ai-coding-agent-setup](ai-coding-agent-setup/SKILL.md) | 4 files | Configure AI agents (Copilot, Claude Code, Cursor) to understand a codebase via AGENTS.md, agent skills, and MCP — plus self-improvement strategies |
 | [avalonia](avalonia/SKILL.md) | 6 files | Cross-platform .NET UI with Avalonia |
 | [azure-devops](azure-devops/SKILL.md) | 7 files | Azure DevOps REST API |
 | [azure-swa](azure-swa/SKILL.md) | 6 files | Azure Static Web Apps |
