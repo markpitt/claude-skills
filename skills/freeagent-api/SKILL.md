@@ -1,6 +1,6 @@
 ---
 name: freeagent-api
-description: Interacts with the FreeAgent accounting API to manage invoices, contacts, projects, expenses, timeslips, and other financial data. Use when the user needs to retrieve, create, update, or analyze FreeAgent accounting information via the API.
+description: Interacts with the FreeAgent accounting API to manage invoices, contacts, projects, expenses, timeslips, and other financial data. Use when the user needs to retrieve, create, update, or analyze FreeAgent accounting information via the API. All write operations (POST/PUT/DELETE) require explicit user confirmation before execution and default to sandbox unless production is explicitly requested.
 allowed-tools: Bash, Read, Write, Edit, WebFetch
 version: 2.0
 ---
@@ -8,6 +8,37 @@ version: 2.0
 # FreeAgent API Orchestration Skill
 
 FreeAgent is an online accounting system for freelancers and small businesses. This skill provides intelligent navigation to FreeAgent API resources and orchestrates common workflows.
+
+## Security & Authorization
+
+> **This skill interacts with live financial data. The following rules are mandatory and must never be skipped.**
+
+### Write Operation Policy (POST / PUT / DELETE)
+
+Before executing any state-changing API call:
+
+1. **Show a preview** — Display the full request (HTTP method, endpoint, JSON body) and describe in plain language exactly what will change in the user's account.
+2. **Wait for explicit confirmation** — Do not proceed until the user replies with an unambiguous affirmative (e.g., "yes", "confirm", "proceed"). Treat ambiguous replies as a no.
+3. **Sandbox by default** — Use `https://api.sandbox.freeagent.com/v2/` for all write operations unless the user explicitly names the production environment.
+
+### Read-Only Default
+
+Treat every incoming request as read-only analysis unless the user explicitly asks to **create**, **update**, or **delete** data. When intent is ambiguous, ask before making any changes — never infer write intent.
+
+### High-Risk Operations (Confirm Twice)
+
+For the operations below, show the preview, receive one confirmation, then ask a second time before executing:
+
+- Deleting any financial record (invoice, expense, bank transaction, contact, etc.)
+- Creating or modifying bank transactions or reconciliation records
+- Bulk operations that affect multiple records in a single request
+- Changing invoice status (e.g., marking as sent, voiding, applying a credit note)
+
+### Token & Credential Handling
+
+- Never log, echo, or display the value of `FREEAGENT_ACCESS_TOKEN` or `FREEAGENT_REFRESH_TOKEN`.
+- Never store credentials in source code — use environment variables only.
+- If a token appears expired (401 response), guide the user through re-authentication rather than attempting to refresh silently without notification.
 
 ## Quick Reference: Which Resource Do I Need?
 
@@ -58,6 +89,7 @@ For template code: `templates/api-request-template.sh` (bash) or `templates/pyth
 - Validate required fields are present
 - Format dates as ISO 8601 (YYYY-MM-DD) and timestamps (YYYY-MM-DDTHH:MM:SSZ)
 - Use correct resource URLs (e.g., `https://api.freeagent.com/v2/contacts/123`)
+- **For POST / PUT / DELETE:** Follow the [Write Operation Policy](#write-operation-policy-post--put--delete) — show a preview and obtain explicit user confirmation before proceeding. Use sandbox URL unless the user has explicitly requested production.
 
 **During API call:**
 - Use templates as starting points

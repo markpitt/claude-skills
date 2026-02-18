@@ -25,7 +25,8 @@ class FreeAgentClient:
         self,
         access_token: Optional[str] = None,
         api_url: Optional[str] = None,
-        sandbox: bool = False
+        sandbox: bool = True,
+        dry_run: bool = False
     ):
         """
         Initialize FreeAgent API client
@@ -33,19 +34,30 @@ class FreeAgentClient:
         Args:
             access_token: OAuth access token (defaults to FREEAGENT_ACCESS_TOKEN env var)
             api_url: API base URL (defaults to FREEAGENT_API_URL env var)
-            sandbox: Use sandbox environment if True
+            sandbox: Use sandbox environment (default: True — must explicitly pass
+                     sandbox=False to target production)
+            dry_run: When True, print the request that would be made but do not
+                     execute it. Use to preview write operations safely.
         """
         self.access_token = access_token or os.getenv('FREEAGENT_ACCESS_TOKEN')
         if not self.access_token:
             raise FreeAgentAPIError("Access token not provided")
 
-        if sandbox:
-            self.api_url = 'https://api.sandbox.freeagent.com/v2'
-        else:
+        self.dry_run = dry_run
+
+        # Default to sandbox; production requires an explicit opt-in.
+        if not sandbox:
             self.api_url = api_url or os.getenv(
                 'FREEAGENT_API_URL',
                 'https://api.freeagent.com/v2'
             )
+            print(
+                "WARNING: Targeting the PRODUCTION FreeAgent environment. "
+                "All write operations will affect real financial data.",
+                file=sys.stderr
+            )
+        else:
+            self.api_url = 'https://api.sandbox.freeagent.com/v2'
 
         self.headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -53,6 +65,17 @@ class FreeAgentClient:
             'Content-Type': 'application/json',
             'User-Agent': 'FreeAgentPythonClient/1.0'
         }
+
+    def _confirm_write(self, method: str, url: str, data: Optional[Dict]) -> bool:
+        """Print a preview of a write operation and prompt the user to confirm."""
+        print("\n--- Write Operation Preview ---", file=sys.stderr)
+        print(f"  Method : {method}", file=sys.stderr)
+        print(f"  URL    : {url}", file=sys.stderr)
+        if data:
+            print(f"  Body   : {json.dumps(data, indent=2)}", file=sys.stderr)
+        print("-------------------------------", file=sys.stderr)
+        reply = input("Confirm this operation? [y/N]: ").strip().lower()
+        return reply in ("y", "yes")
 
     def _request(
         self,
@@ -77,6 +100,18 @@ class FreeAgentClient:
             FreeAgentAPIError: If request fails
         """
         url = f"{self.api_url}/{endpoint.lstrip('/')}"
+
+        # Guard: preview and confirm all write operations.
+        if method in ('POST', 'PUT', 'DELETE'):
+            if self.dry_run:
+                print("\n[DRY RUN] The following request would be sent:", file=sys.stderr)
+                print(f"  Method : {method}", file=sys.stderr)
+                print(f"  URL    : {url}", file=sys.stderr)
+                if data:
+                    print(f"  Body   : {json.dumps(data, indent=2)}", file=sys.stderr)
+                return {}
+            if not self._confirm_write(method, url, data):
+                raise FreeAgentAPIError("Operation cancelled by user.")
 
         try:
             response = requests.request(
@@ -205,8 +240,11 @@ class FreeAgentClient:
 def main():
     """Example usage"""
     try:
-        # Initialize client
-        client = FreeAgentClient()
+        # Initialize client.
+        # sandbox=True (the default) targets the sandbox environment.
+        # Pass sandbox=False only when you deliberately want to modify production data.
+        # Pass dry_run=True to preview write operations without executing them.
+        client = FreeAgentClient(sandbox=True)
 
         # Get company info
         company = client.get_company()
