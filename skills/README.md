@@ -6,7 +6,7 @@ description: Master guide to the refactored modular skill structure. Navigation,
 # Skills Repository Guide - Modular Orchestration Pattern
 
 **Last Updated:** December 4, 2025  
-**Refactoring Status:** Phase 4 Complete - 10 skills refactored, 7 remaining
+**Refactoring Status:** Phase 4 Complete - 11 skills refactored, 7 remaining
 
 ---
 
@@ -35,12 +35,28 @@ This repository contains **modular AI skills** organized using an **orchestratio
 - **After:** Main hub (120-230 lines) + 5-7 focused resources (180-600 lines each)
 - **Result:** Faster navigation, clearer scope, easier maintenance
 
+### Included Skills
+
+| Skill | Description |
+|---|---|
+| [github-api](github-api/SKILL.md) | GitHub REST & GraphQL API |
+| [azure-swa](azure-swa/SKILL.md) | Azure Static Web Apps |
+| [home-assistant-api](home-assistant-api/SKILL.md) | Smart home automation |
+| [azure-devops](azure-devops/SKILL.md) | Azure DevOps REST API |
+| [avalonia](avalonia/SKILL.md) | Cross-platform .NET UI |
+| [gof-design-patterns](gof-design-patterns/SKILL.md) | Gang of Four patterns |
+| [agent-patterns](agent-patterns/SKILL.md) | AI agent workflows |
+| [dotnet-aspire](dotnet-aspire/SKILL.md) | .NET cloud deployment |
+| [fine-tuning-data-generator](fine-tuning-data-generator/SKILL.md) | ML training data generation |
+| [markdown-formatter](markdown-formatter/SKILL.md) | Markdown processing tools |
+| [twelve-factor-app](twelve-factor-app/SKILL.md) | Cloud-native SaaS app methodology (12factor.net) |
+
 ### Key Metrics
 
 | Metric | Value |
 |--------|-------|
-| **Total Skills** | 17 (10 refactored, 7 remaining) |
-| **Refactored Skills** | 10 |
+| **Total Skills** | 18 (11 refactored, 7 remaining) |
+| **Refactored Skills** | 11 |
 | **Total Lines Reduced** | ~4,500 lines (-42% average in hubs) |
 | **Resource Files Created** | 65 files |
 | **Average Hub Size** | 260 lines |
@@ -141,6 +157,7 @@ skill-name/
 | **[dotnet-aspire](dotnet-aspire/SKILL.md)** | 683 | 5 files | .NET cloud deployment |
 | **[fine-tuning-data-generator](fine-tuning-data-generator/SKILL.md)** | 279 | 6 files | ML training data generation |
 | **[markdown-formatter](markdown-formatter/SKILL.md)** | 311 | 7 files | Markdown processing tools |
+| **[twelve-factor-app](twelve-factor-app/SKILL.md)** | ~200 | 7 files | Cloud-native SaaS app methodology |
 
 ---
 
