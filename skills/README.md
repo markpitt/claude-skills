@@ -51,6 +51,7 @@ This repository contains **modular AI skills** organized using an **orchestratio
 | [kiss-principle](kiss-principle/SKILL.md) | 3 files | KISS software design principle |
 | [markdown-formatter](markdown-formatter/SKILL.md) | 7 files | Markdown formatting and processing |
 | [microsoft-graph](microsoft-graph/SKILL.md) | 5 files | Microsoft Graph API |
+| [mise](mise/SKILL.md) | 6 files | mise-en-place dev tool and environment orchestrator (replaces asdf, nvm, direnv, make) |
 | [root-cause-analysis](root-cause-analysis/SKILL.md) | 4 files | Root cause analysis methodology |
 | [thought-patterns](thought-patterns/SKILL.md) | 4 files | Structured thinking and reasoning patterns |
 | [twelve-factor-app](twelve-factor-app/SKILL.md) | 7 files | Twelve-Factor App methodology for cloud-native SaaS |
