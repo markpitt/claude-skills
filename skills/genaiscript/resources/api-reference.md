@@ -273,14 +273,16 @@ defTool(
     async () => new Date().toISOString()
 )
 
-// Tool with parameters
+// Tool with parameters — note: validate all LLM-supplied arguments before external calls
+// to prevent SSRF and injection via attacker-controlled prompt arguments
+const WEATHER_API_BASE = "https://api.weather.com"
 defTool(
     "fetchWeather",
-    "Fetches weather data for a location",
+    "Fetches weather data for a named city",
     {
         location: {
             type: "string",
-            description: "City name or coordinates"
+            description: "City name (letters, spaces, commas only)"
         },
         units: {
             type: "string",
@@ -289,10 +291,17 @@ defTool(
         }
     },
     async (args) => {
-        const response = await fetch(
-            `https://api.weather.com/v1/current?location=${args.location}&units=${args.units}`
-        )
-        return await response.json()
+        // Validate LLM-supplied input before use in external request
+        if (!/^[a-zA-Z\s,.-]{1,100}$/.test(args.location)) {
+            throw new Error("Invalid location: only city names are accepted")
+        }
+        const units = ["metric", "imperial"].includes(args.units) ? args.units : "metric"
+        const url = `${WEATHER_API_BASE}/v1/current?location=${encodeURIComponent(args.location)}&units=${units}`
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Weather API error: ${response.status}`)
+        const data = await response.json()
+        // Return only typed, expected fields — not the raw API response
+        return { temperature: data.temp, condition: data.weather, city: data.city }
     }
 )
 
@@ -365,13 +374,16 @@ defAgent(
 
 **Example:**
 ```javascript
-// Research agent
+// Research agent — SECURITY NOTE: agents with webSearch/external tools are susceptible
+// to indirect prompt injection (W011). Web content may contain adversarial instructions.
+// Mitigate by: (1) isolating content extraction from action execution, (2) using strict
+// defSchema output, (3) including system.safety. See patterns.md → Security Patterns.
 defAgent(
     "researcher",
     "Researches topics and summarizes findings",
     {
         model: "openai:gpt-4",
-        system: ["You are a research assistant"],
+        system: ["You are a research assistant", "system.safety"],
         tools: ["webSearch", "summarize"],
         temperature: 0.7
     }
