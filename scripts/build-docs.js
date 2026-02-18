@@ -639,6 +639,10 @@ function build() {
     const gettingStarted = generateGettingStartedPage();
     fs.writeFileSync(path.join(DOCS_DIR, 'getting-started.html'), gettingStarted);
     console.log('✓ Generated getting-started.html');
+
+    // Prevent GitHub Pages from running Jekyll on the static output
+    fs.writeFileSync(path.join(DOCS_DIR, '.nojekyll'), '');
+    console.log('✓ Generated .nojekyll');
     
     console.log('\n✅ Build complete!');
     console.log(`   Output: ${DOCS_DIR}`);

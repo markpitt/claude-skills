@@ -30,6 +30,9 @@ jobs:
       - name: Build documentation
         run: node scripts/build-docs.js
 
+      - name: Disable Jekyll processing
+        run: touch docs/.nojekyll
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
