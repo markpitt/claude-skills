@@ -320,6 +320,8 @@ Before implementing your chosen pattern:
 - [ ] Tool interfaces follow poka-yoke principles
 - [ ] Stopping conditions defined (especially for agents)
 - [ ] Monitoring and logging planned
+- [ ] **External/retrieved content delimited and treated as untrusted data (W011 prompt injection defence)**
+- [ ] **System prompts explicitly instruct model not to follow directives in retrieved content**
 
 **Testing Phase:**
 - [ ] Happy path tested thoroughly
