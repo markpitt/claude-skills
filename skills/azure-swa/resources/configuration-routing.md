@@ -1,5 +1,7 @@
 # Configuration & Routing
 
+> **Security reminder:** All route patterns, role names, header values, and redirect URLs that come from user input must be validated before being written to `staticwebapp.config.json`. See the "Input Sanitization" table in `SKILL.md` for required validation rules. Never write unsanitized user input to this file.
+
 ## staticwebapp.config.json
 
 The `staticwebapp.config.json` file controls routing, authentication, and other runtime behaviors.

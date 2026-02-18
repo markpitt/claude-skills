@@ -1,5 +1,7 @@
 # Deployment & CI/CD
 
+> **Security reminder:** Only run `swa`, `az`, `npm`, and `git` commands. Never construct shell arguments by concatenating user-supplied strings without validation. Environment variable names and deployment token values sourced from user input must be validated before use (see "Input Sanitization" table in `SKILL.md`). Do not store secrets in workflow files — always use GitHub Secrets or Azure Key Vault references.
+
 ## GitHub Actions (Automatic)
 
 When you create an Azure Static Web App from the Azure Portal and connect to GitHub, Azure automatically creates a GitHub Actions workflow.
