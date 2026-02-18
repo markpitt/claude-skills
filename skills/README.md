@@ -40,6 +40,7 @@ This repository contains **modular AI skills** organized using an **orchestratio
 | [azure-swa](azure-swa/SKILL.md) | 6 files | Azure Static Web Apps |
 | [blazor-blog-feature](blazor-blog-feature/SKILL.md) | 5 files | Blazor blog feature implementation |
 | [blazor-expert](blazor-expert/SKILL.md) | 5 files | Advanced Blazor development |
+| [devcontainers](devcontainers/SKILL.md) | 5 files | Dev Container Specification — devcontainer.json, Features, Templates, multi-container, cloud environments |
 | [dotnet-aspire](dotnet-aspire/SKILL.md) | 5 files | .NET Aspire cloud deployment |
 | [fine-tuning-data-generator](fine-tuning-data-generator/SKILL.md) | 6 files | ML training data generation |
 | [freeagent-api](freeagent-api/SKILL.md) | 5 files | FreeAgent accounting API |
