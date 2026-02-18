@@ -1,4 +1,3 @@
-```markdown
 # RCA Methodologies: Comprehensive Guide
 
 This resource covers the five core root cause analysis methodologies with step-by-step guidance, when to use each, and practical examples.
@@ -599,4 +598,3 @@ This embodies Toyota's Kaizen philosophy of continuous improvement.
 ---
 
 **Remember**: The goal is disciplined systematic investigation until reaching a root cause you can actually fix. Sometimes that's three whys, sometimes seven. The number matters less than the rigor of the process.
-```

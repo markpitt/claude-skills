@@ -1,4 +1,3 @@
-```markdown
 # Advanced RCA Techniques: Complex Problem Orchestration
 
 This resource covers advanced methodologies and strategies for high-complexity root cause analyses, formal methods, and multi-methodology orchestration patterns.
@@ -565,4 +564,3 @@ Connect RCA findings to improvement initiatives:
 ---
 
 **Remember**: Advanced methodologies provide rigor for high-stakes problems. Don't let formality prevent action—use as much rigor as situation demands, not more.
-```
