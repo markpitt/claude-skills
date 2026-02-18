@@ -19,6 +19,24 @@ fi
 
 FILE="$1"
 
+# Reject path traversal sequences
+if [[ "$FILE" == *".."* ]]; then
+    echo -e "${RED}Error: Path traversal not allowed in file path${NC}"
+    exit 1
+fi
+
+# Whitelist safe path characters (letters, digits, dash, underscore, dot, slash, space)
+if [[ "$FILE" =~ [^a-zA-Z0-9_./:' '-] ]]; then
+    echo -e "${RED}Error: File path contains invalid characters${NC}"
+    exit 1
+fi
+
+# Require .md extension
+if [[ "$FILE" != *.md ]]; then
+    echo -e "${RED}Error: File must have a .md extension${NC}"
+    exit 1
+fi
+
 # Check if file exists
 if [ ! -f "$FILE" ]; then
     echo -e "${RED}Error: File not found: $FILE${NC}"
@@ -33,51 +51,51 @@ echo "Validating: $FILE"
 echo "----------------------------------------"
 
 # Check 1: File ends with newline
-if [ -n "$(tail -c 1 "$FILE")" ]; then
+if [ -n "$(tail -c 1 -- "$FILE")" ]; then
     echo -e "${YELLOW}WARNING: File does not end with newline${NC}"
     ((WARNINGS++))
 fi
 
 # Check 2: No trailing whitespace
-if grep -n ' $' "$FILE" > /dev/null 2>&1; then
+if grep -n ' $' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Trailing whitespace found on lines:${NC}"
-    grep -n ' $' "$FILE" | cut -d: -f1 | tr '\n' ' '
+    grep -n ' $' -- "$FILE" | cut -d: -f1 | tr '\n' ' '
     echo ""
     ((WARNINGS++))
 fi
 
 # Check 3: No tabs (prefer spaces)
-if grep -n $'\t' "$FILE" > /dev/null 2>&1; then
+if grep -n $'\t' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Tabs found on lines:${NC}"
-    grep -n $'\t' "$FILE" | cut -d: -f1 | tr '\n' ' '
+    grep -n $'\t' -- "$FILE" | cut -d: -f1 | tr '\n' ' '
     echo ""
     ((WARNINGS++))
 fi
 
 # Check 4: Code blocks have language identifiers
-if grep -n '^```$' "$FILE" > /dev/null 2>&1; then
+if grep -n '^```$' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Code blocks without language identifier on lines:${NC}"
-    grep -n '^```$' "$FILE" | cut -d: -f1 | tr '\n' ' '
+    grep -n '^```$' -- "$FILE" | cut -d: -f1 | tr '\n' ' '
     echo ""
     ((WARNINGS++))
 fi
 
 # Check 5: Multiple consecutive blank lines
-if grep -Pzo '\n\n\n+' "$FILE" > /dev/null 2>&1; then
+if grep -Pzo '\n\n\n+' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Multiple consecutive blank lines found${NC}"
     ((WARNINGS++))
 fi
 
 # Check 6: Headers start with #
-if grep -n '^[A-Za-z].*\n[=-]\+$' "$FILE" > /dev/null 2>&1; then
+if grep -n '^[A-Za-z].*\n[=-]\+$' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Underline-style headers found (use ATX-style)${NC}"
     ((WARNINGS++))
 fi
 
 # Check 7: Check for common list marker inconsistencies
-ASTERISK_COUNT=$(grep -c '^\* ' "$FILE" 2>/dev/null || true)
-PLUS_COUNT=$(grep -c '^+ ' "$FILE" 2>/dev/null || true)
-DASH_COUNT=$(grep -c '^- ' "$FILE" 2>/dev/null || true)
+ASTERISK_COUNT=$(grep -c '^\* ' -- "$FILE" 2>/dev/null || true)
+PLUS_COUNT=$(grep -c '^+ ' -- "$FILE" 2>/dev/null || true)
+DASH_COUNT=$(grep -c '^- ' -- "$FILE" 2>/dev/null || true)
 
 if [ $ASTERISK_COUNT -gt 0 ] && [ $DASH_COUNT -gt 0 ]; then
     echo -e "${YELLOW}WARNING: Mixed list markers (* and -) found${NC}"
@@ -92,33 +110,33 @@ if [ $PLUS_COUNT -gt 0 ]; then
 fi
 
 # Check 8: Check for bad link text
-if grep -i '\[click here\]' "$FILE" > /dev/null 2>&1; then
+if grep -i '\[click here\]' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: 'Click here' links found (use descriptive text)${NC}"
     ((WARNINGS++))
 fi
 
-if grep -i '\[here\]' "$FILE" > /dev/null 2>&1; then
+if grep -i '\[here\]' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: 'Here' links found (use descriptive text)${NC}"
     ((WARNINGS++))
 fi
 
 # Check 9: Check for images without alt text
-if grep -n '!\[\](' "$FILE" > /dev/null 2>&1; then
+if grep -n '!\[\](' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Images without alt text on lines:${NC}"
-    grep -n '!\[\](' "$FILE" | cut -d: -f1 | tr '\n' ' '
+    grep -n '!\[\](' -- "$FILE" | cut -d: -f1 | tr '\n' ' '
     echo ""
     ((WARNINGS++))
 fi
 
 # Check 10: Check for emphasis with underscores
-if grep '__[^_]*__' "$FILE" > /dev/null 2>&1; then
+if grep '__[^_]*__' -- "$FILE" > /dev/null 2>&1; then
     echo -e "${YELLOW}WARNING: Bold with __ found (prefer **)${NC}"
     ((WARNINGS++))
 fi
 
-if grep '_[^_]*_' "$FILE" > /dev/null 2>&1; then
+if grep '_[^_]*_' -- "$FILE" > /dev/null 2>&1; then
     # Exclude URLs which may have underscores
-    if grep -v 'http' "$FILE" | grep '_[^_]*_' > /dev/null 2>&1; then
+    if grep -v 'http' -- "$FILE" | grep '_[^_]*_' > /dev/null 2>&1; then
         echo -e "${YELLOW}WARNING: Italic with _ found (prefer *)${NC}"
         ((WARNINGS++))
     fi
