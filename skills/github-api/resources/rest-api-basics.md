@@ -1,5 +1,18 @@
 # REST API Basics: Authentication, Pagination, Rate Limiting & Error Handling
 
+## Security: Credential Handling
+
+**Never embed API tokens verbatim in outputs or generated commands.** Always reference tokens via environment variables or use the `gh` CLI which handles authentication transparently:
+
+```bash
+# Set once in your shell profile:
+export GITHUB_TOKEN="<your-token>"  # or use: gh auth login
+```
+
+Never print, echo, or concatenate a token value directly into a command string shown to users.
+
+---
+
 ## Authentication Methods
 
 ### 1. GitHub CLI (`gh`)
@@ -18,15 +31,17 @@ gh api repos/owner/repo/issues
 ```
 
 ### 2. Personal Access Token (PAT)
-For direct API calls:
+For direct API calls, store the token as an environment variable first:
 
 ```bash
+export GITHUB_TOKEN="<your-token>"  # set once
+
 # Classic PAT
-curl -H "Authorization: token YOUR_TOKEN" \
+curl -H "Authorization: token $GITHUB_TOKEN" \
   https://api.github.com/user
 
 # Fine-grained PAT (recommended)
-curl -H "Authorization: Bearer YOUR_TOKEN" \
+curl -H "Authorization: Bearer $GITHUB_TOKEN" \
   https://api.github.com/user
 ```
 
@@ -34,8 +49,9 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 For building integrations:
 
 ```bash
-# Installation access token
-curl -H "Authorization: Bearer INSTALLATION_TOKEN" \
+# Installation access token (store in env var, never inline)
+export INSTALLATION_TOKEN="<installation-access-token>"
+curl -H "Authorization: Bearer $INSTALLATION_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/installation/repositories
 ```
@@ -44,8 +60,9 @@ curl -H "Authorization: Bearer INSTALLATION_TOKEN" \
 For user authentication flows:
 
 ```bash
-# After OAuth flow completion
-curl -H "Authorization: token USER_ACCESS_TOKEN" \
+# After OAuth flow completion (store token in env var)
+export GITHUB_TOKEN="<user-access-token>"
+curl -H "Authorization: token $GITHUB_TOKEN" \
   https://api.github.com/user
 ```
 
@@ -76,8 +93,8 @@ gh api graphql -f query='
     }
   }'
 
-# Using curl
-curl -H "Authorization: Bearer TOKEN" \
+# Using curl (token from environment variable)
+curl -H "Authorization: Bearer $GITHUB_TOKEN" \
   -X POST -d '{"query":"query { viewer { login name } }"}' \
   https://api.github.com/graphql
 ```
