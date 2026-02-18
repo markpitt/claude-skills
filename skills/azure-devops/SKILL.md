@@ -6,6 +6,10 @@ version: 1.0
 
 # Azure DevOps API Skill
 
+## Security
+
+**Never output, suggest, or generate code that embeds PAT values verbatim.** Always reference credentials via environment variables (e.g., `$AZURE_DEVOPS_PAT`) or a secrets manager such as Azure Key Vault. When generating scripts or curl examples, use placeholder variable references — never literal token strings.
+
 This skill provides comprehensive guidance for working with the Azure DevOps REST API, enabling programmatic access to all Azure DevOps Services and Azure DevOps Server resources.
 
 ## Overview
@@ -35,7 +39,7 @@ GET https://dev.azure.com/{organization}/_apis/projects?api-version=7.1
 Authorization: Basic {base64-encoded-PAT}
 ```
 
-To encode PAT: `base64(":{PAT}")` - Note the colon before the PAT.
+To encode PAT: `base64(":{PAT}")` — Note the colon before the PAT. Always read the PAT from an environment variable (e.g., `$AZURE_DEVOPS_PAT`) rather than hardcoding it in scripts or outputs.
 
 ### Common Request Pattern
 ```http
@@ -779,15 +783,20 @@ az boards work-item create --title "Bug" --type Bug
 ```
 
 ### Testing Authentication
-Test PAT authentication:
+Test PAT authentication using an environment variable — never hardcode the token:
 ```bash
-# Encode PAT
-PAT_ENCODED=$(echo -n ":YOUR_PAT" | base64)
+# Set once in your shell session (do not commit this to scripts or source control)
+# export AZURE_DEVOPS_PAT="<your-pat>"
+
+# Encode from environment variable
+PAT_ENCODED=$(echo -n ":$AZURE_DEVOPS_PAT" | base64)
 
 # Test
 curl -H "Authorization: Basic $PAT_ENCODED" \
   "https://dev.azure.com/{organization}/_apis/projects?api-version=7.1"
 ```
+
+**Preferred:** Use `az devops login` which handles credential storage securely without manual encoding.
 
 ### SDKs Available
 - **.NET** - `Microsoft.TeamFoundationServer.Client`, `Microsoft.VisualStudio.Services.Client`
