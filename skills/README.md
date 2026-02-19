@@ -5,7 +5,7 @@ description: Guide to the modular skill structure, navigation, and patterns for 
 
 # Skills Repository Guide
 
-**Last Updated:** February 18, 2026
+**Last Updated:** February 19, 2026
 
 ---
 
@@ -45,6 +45,15 @@ This repository contains **modular AI skills** organized using an **orchestratio
 | [dotnet-aspire](dotnet-aspire/SKILL.md) | 5 files | .NET Aspire cloud deployment |
 | [fine-tuning-data-generator](fine-tuning-data-generator/SKILL.md) | 6 files | ML training data generation |
 | [freeagent-api](freeagent-api/SKILL.md) | 5 files | FreeAgent accounting API |
+| [gcse-art-tutor](gcse-art-tutor/SKILL.md) | 4 files | GCSE Art and Design (Fine Art) tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/Eduqas/WJEC) — sketchbook, annotations, ESA themes, portfolio, visual language |
+| [gcse-biology-tutor](gcse-biology-tutor/SKILL.md) | 4 files | GCSE Biology tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/WJEC) |
+| [gcse-history-tutor](gcse-history-tutor/SKILL.md) | 4 files | GCSE History tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/Eduqas/WJEC) — exam technique, source analysis, essay writing, spec updates |
+| [gcse-chemistry-tutor](gcse-chemistry-tutor/SKILL.md) | 4 files | GCSE Chemistry tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/WJEC) |
+| [gcse-english-language-tutor](gcse-english-language-tutor/SKILL.md) | 4 files | GCSE English Language tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/Eduqas/WJEC) |
+| [gcse-english-literature-tutor](gcse-english-literature-tutor/SKILL.md) | 4 files | GCSE English Literature tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/Eduqas) — set texts, poetry, essay technique |
+| [gcse-maths-tutor](gcse-maths-tutor/SKILL.md) | 3 files | GCSE Maths tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/Eduqas) |
+| [gcse-pe-tutor](gcse-pe-tutor/SKILL.md) | 4 files | GCSE Physical Education tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/WJEC) — anatomy, physiology, sports psychology, socio-cultural, exam technique |
+| [gcse-physics-tutor](gcse-physics-tutor/SKILL.md) | 4 files | GCSE Physics tutor and revision assistant for 15–16 year olds (2026 exams, AQA/Edexcel/OCR/WJEC) |
 | [genaiscript](genaiscript/SKILL.md) | 4 files | GenAIScript scripting framework |
 | [github-api](github-api/SKILL.md) | 7 files | GitHub REST & GraphQL API |
 | [gof-design-patterns](gof-design-patterns/SKILL.md) | 6 files | Gang of Four design patterns |
