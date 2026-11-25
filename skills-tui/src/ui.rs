@@ -178,7 +178,7 @@ fn render_skill_details(f: &mut Frame, state: &AppState, area: Rect) {
         } else {
             skill.source.clone()
         };
-        
+
         let details = format!(
             "Name: {}\nVersion: {}\nSource: {}\nPath: {}\n\nDescription:\n{}",
             skill.name,

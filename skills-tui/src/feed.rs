@@ -32,15 +32,13 @@ fn default_cache_dir() -> String {
 impl Default for FeedsConfig {
     fn default() -> Self {
         Self {
-            feeds: vec![
-                Feed {
-                    name: "local".to_string(),
-                    url: String::new(),
-                    enabled: true,
-                    description: "Local skills directory".to_string(),
-                    branch: None,
-                },
-            ],
+            feeds: vec![Feed {
+                name: "local".to_string(),
+                url: String::new(),
+                enabled: true,
+                description: "Local skills directory".to_string(),
+                branch: None,
+            }],
             cache_dir: default_cache_dir(),
         }
     }
@@ -88,6 +86,29 @@ impl FeedsConfig {
     }
 }
 
+/// Immediate subdirectories of `dir` that contain a SKILL.md.
+///
+/// IO errors are propagated rather than swallowed, so an unreadable directory
+/// is reported instead of being indistinguishable from an empty one. Callers
+/// probing an optional location should check it exists first.
+fn skill_dirs_in(dir: &Path) -> Result<Vec<PathBuf>> {
+    let mut skills = Vec::new();
+
+    let entries =
+        fs::read_dir(dir).with_context(|| format!("Failed to read directory {}", dir.display()))?;
+
+    for entry in entries {
+        let path = entry
+            .with_context(|| format!("Failed to read an entry in {}", dir.display()))?
+            .path();
+        if path.is_dir() && path.join("SKILL.md").exists() {
+            skills.push(path);
+        }
+    }
+
+    Ok(skills)
+}
+
 /// Manager for git-based skill feeds
 pub struct FeedManager {
     config: FeedsConfig,
@@ -100,7 +121,7 @@ impl FeedManager {
     pub fn new(config_path: PathBuf) -> Result<Self> {
         let config = FeedsConfig::load(&config_path)?;
         let cache_dir = PathBuf::from(&config.cache_dir);
-        
+
         Ok(Self {
             config,
             config_path,
@@ -126,7 +147,7 @@ impl FeedManager {
     /// Clone or update a git repository
     fn clone_or_update(&self, feed: &Feed) -> Result<PathBuf> {
         let repo_dir = self.cache_dir.join(&feed.name);
-        
+
         fs::create_dir_all(&self.cache_dir)?;
 
         if repo_dir.exists() {
@@ -143,12 +164,12 @@ impl FeedManager {
         } else {
             // Clone new repository
             let mut args = vec!["clone", "--depth", "1"];
-            
+
             if let Some(branch) = &feed.branch {
                 args.push("-b");
                 args.push(branch);
             }
-            
+
             args.push(&feed.url);
             args.push(repo_dir.to_str().unwrap());
 
@@ -166,34 +187,17 @@ impl FeedManager {
         Ok(repo_dir)
     }
 
-    /// Discover skills in a repository
-    pub fn discover_skills_in_repo(&self, repo_path: &Path) -> Vec<PathBuf> {
-        let mut skills = Vec::new();
+    /// Discover skills in a repository, checking the root and a `skills/`
+    /// subdirectory. An absent `skills/` is not an error; an unreadable one is.
+    pub fn discover_skills_in_repo(&self, repo_path: &Path) -> Result<Vec<PathBuf>> {
+        let mut skills = skill_dirs_in(repo_path)?;
 
-        // Check root directory
-        for entry in fs::read_dir(repo_path).into_iter().flatten() {
-            if let Ok(entry) = entry {
-                let path = entry.path();
-                if path.is_dir() && path.join("SKILL.md").exists() {
-                    skills.push(path);
-                }
-            }
+        let nested = repo_path.join("skills");
+        if nested.exists() {
+            skills.extend(skill_dirs_in(&nested)?);
         }
 
-        // Check skills/ subdirectory
-        let skills_dir = repo_path.join("skills");
-        if skills_dir.exists() {
-            for entry in fs::read_dir(&skills_dir).into_iter().flatten() {
-                if let Ok(entry) = entry {
-                    let path = entry.path();
-                    if path.is_dir() && path.join("SKILL.md").exists() {
-                        skills.push(path);
-                    }
-                }
-            }
-        }
-
-        skills
+        Ok(skills)
     }
 
     /// Update all enabled feeds and return discovered skill paths
@@ -206,9 +210,11 @@ impl FeedManager {
                 continue;
             }
 
-            match self.clone_or_update(feed) {
-                Ok(repo_path) => {
-                    let skills = self.discover_skills_in_repo(&repo_path);
+            match self
+                .clone_or_update(feed)
+                .and_then(|repo_path| self.discover_skills_in_repo(&repo_path))
+            {
+                Ok(skills) => {
                     results.push((feed.name.clone(), skills));
                 }
                 Err(e) => {
@@ -227,12 +233,8 @@ impl FeedManager {
         // Add local skills first
         if let Some(local) = local_dir {
             if local.exists() {
-                for entry in fs::read_dir(local)? {
-                    let entry = entry?;
-                    let path = entry.path();
-                    if path.is_dir() && path.join("SKILL.md").exists() {
-                        all_skills.push(("local".to_string(), path));
-                    }
+                for path in skill_dirs_in(local)? {
+                    all_skills.push(("local".to_string(), path));
                 }
             }
         }
@@ -245,7 +247,7 @@ impl FeedManager {
 
             let repo_dir = self.cache_dir.join(&feed.name);
             if repo_dir.exists() {
-                for skill_path in self.discover_skills_in_repo(&repo_dir) {
+                for skill_path in self.discover_skills_in_repo(&repo_dir)? {
                     all_skills.push((feed.name.clone(), skill_path));
                 }
             }
@@ -294,5 +296,68 @@ mod tests {
         let removed = config.remove_feed("test");
         assert!(removed);
         assert_eq!(config.feeds.len(), 1);
+    }
+
+    /// Create `parent/name/SKILL.md` so the directory looks like a skill
+    fn make_skill(parent: &Path, name: &str) {
+        let dir = parent.join(name);
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("SKILL.md"), "---\nname: test\n---\n").unwrap();
+    }
+
+    fn manager_in(dir: &Path) -> FeedManager {
+        FeedManager::new(dir.join("feeds.json")).unwrap()
+    }
+
+    #[test]
+    fn test_discover_skills_in_repo_scans_root_and_skills_subdir() {
+        let dir = tempdir().unwrap();
+        let repo = dir.path().join("repo");
+
+        make_skill(&repo, "root-skill");
+        make_skill(&repo.join("skills"), "nested-skill");
+        // Neither of these should be picked up
+        fs::create_dir_all(repo.join("not-a-skill")).unwrap();
+        fs::write(repo.join("README.md"), "not a directory").unwrap();
+
+        let mut found: Vec<String> = manager_in(dir.path())
+            .discover_skills_in_repo(&repo)
+            .unwrap()
+            .iter()
+            .map(|p| p.file_name().unwrap().to_string_lossy().into_owned())
+            .collect();
+        found.sort();
+
+        assert_eq!(found, vec!["nested-skill", "root-skill"]);
+    }
+
+    #[test]
+    fn test_discover_skills_in_repo_without_skills_subdir() {
+        let dir = tempdir().unwrap();
+        let repo = dir.path().join("repo");
+        make_skill(&repo, "only-skill");
+
+        let found = manager_in(dir.path())
+            .discover_skills_in_repo(&repo)
+            .unwrap();
+
+        assert_eq!(found.len(), 1);
+        assert!(found[0].ends_with("only-skill"));
+    }
+
+    #[test]
+    fn test_discover_skills_in_repo_missing_directory_errors() {
+        let dir = tempdir().unwrap();
+        let absent = dir.path().join("absent");
+
+        let err = manager_in(dir.path())
+            .discover_skills_in_repo(&absent)
+            .expect_err("a missing repository directory must not read as empty");
+
+        assert!(
+            err.to_string().contains(&absent.display().to_string()),
+            "error should name the directory it failed on, got: {}",
+            err
+        );
     }
 }

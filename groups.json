@@ -1,0 +1,54 @@
+{
+  "_comment": "The seven skill groups. Each is a directory beside claude-skills with its skills under skills/. Agreed in docs/plans/2026-10-12-claude-skills-audit.md and its 18/11/2026 update. The disk decides which skills a group holds; this file only says where the groups are. public_repo is the group's public twin, and must match release.toml (tests/test_release.py checks it). Names agreed 24/11/2026 in docs/plans/2026-11-24-skill-group-repos.md.",
+  "groups": [
+    {
+      "id": "claude-skills-dotnet",
+      "path": "../claude-skills-dotnet",
+      "public_repo": "markpitt/claude-skills-dotnet",
+      "title": ".NET skills",
+      "summary": ".NET, Blazor, Avalonia, Aspire and the Azure services .NET shops use."
+    },
+    {
+      "id": "claude-skills-language-gurus",
+      "path": "../claude-skills-language-gurus",
+      "public_repo": "markpitt/claude-skills-language-gurus",
+      "title": "Language gurus",
+      "summary": "Current best practice for Python, TypeScript, Rust, Go, shell and PowerShell."
+    },
+    {
+      "id": "claude-skills-engineering-practices",
+      "path": "../claude-skills-engineering-practices",
+      "public_repo": "markpitt/claude-skills-engineering-practices",
+      "title": "Engineering practices",
+      "summary": "Language-neutral craft: TDD, KISS, design patterns, twelve-factor, root cause analysis and decision interviews."
+    },
+    {
+      "id": "claude-skills-api",
+      "path": "../claude-skills-api",
+      "public_repo": "markpitt/claude-skills-api",
+      "title": "API skills",
+      "summary": "Working with REST APIs: GitHub, Microsoft Graph, Home Assistant, FreeAgent, AdGuard Home and Dokploy."
+    },
+    {
+      "id": "claude-skills-ai-engineering",
+      "path": "../claude-skills-ai-engineering",
+      "public_repo": "markpitt/claude-skills-ai-engineering",
+      "title": "AI engineering",
+      "summary": "Building with and around models: agent patterns, coding agent setup and sandboxing, fine-tuning data and project kickoff."
+    },
+    {
+      "id": "claude-skills-dev-environment",
+      "path": "../claude-skills-dev-environment",
+      "public_repo": "markpitt/claude-skills-dev-environment",
+      "title": "Developer environment",
+      "summary": "Tooling around the code: mise, devcontainers, terminal multiplexers, git protection, hosting and markdown."
+    },
+    {
+      "id": "claude-skills-gcse-tutors",
+      "path": "../claude-skills-gcse-tutors",
+      "public_repo": "markpitt/claude-skills-gcse-tutors",
+      "title": "GCSE tutors",
+      "summary": "Nine GCSE revision tutors, frozen at the 2026 exam year."
+    }
+  ]
+}

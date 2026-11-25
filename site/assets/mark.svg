@@ -1,0 +1,11 @@
+<svg viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="mark-crop">
+      <circle cx="230" cy="230" r="230" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#mark-crop)">
+    <rect width="460" height="460" fill="#CE4B00" />
+    <circle cx="230" cy="230" r="145" fill="#2E2823" />
+  </g>
+</svg>

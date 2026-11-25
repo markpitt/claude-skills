@@ -1,0 +1,7 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <mask id="theme-dark-crescent">
+    <rect width="24" height="24" fill="#fff" />
+    <circle cx="15.5" cy="9" r="6.5" fill="#000" />
+  </mask>
+  <circle cx="11" cy="12.5" r="8" fill="currentColor" mask="url(#theme-dark-crescent)" />
+</svg>

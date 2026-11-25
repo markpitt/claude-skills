@@ -11,6 +11,11 @@ on:
     paths:
       - 'skills-tui/**'
 
+# Builds the skills-tui API docs and keeps them as a run artifact. It no longer deploys them:
+# GitHub Pages here is the skills site (deploy-pages.yml), and the token is read-only.
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   RUSTDOCFLAGS: -D warnings
@@ -52,10 +57,3 @@ jobs:
         with:
           name: documentation
           path: skills-tui/target/doc/
-
-      - name: Deploy documentation to GitHub Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./skills-tui/target/doc

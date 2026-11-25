@@ -1,0 +1,146 @@
+name: Release Skills
+
+# Tag-triggered rather than push-triggered. 70 archives on every push to main
+# would be noise, and releases are awkward to prune. A v* tag gives people
+# something citable.
+#
+# This repository is the index: the skills live in the seven group repositories
+# listed in groups.json. A release checks each group out at its highest v* tag,
+# so it only ever packs released skills, and attaches one zip per skill. The
+# site links to them at releases/latest/download/<skill>.zip.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version label for a dry run (no release is published)'
+        required: false
+        default: 'dev'
+
+permissions:
+  contents: write
+  # Read the merged release/vX.Y.Z pull request, whose body is the release notes.
+  pull-requests: read
+
+env:
+  SKILL_GROUPS_DIR: ${{ github.workspace }}/.groups
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Package and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Fails if any group has no v* tag, rather than falling back to main.
+      - name: Check out each group at its latest release
+        run: bash scripts/checkout_groups.sh .groups --latest-tag | tee groups.txt
+
+      # Everything the fast gate checks, before anything is published. An
+      # archive that fails validation must never reach a release page.
+      - name: Validate before packaging
+        run: |
+          mise run skill:validate
+          mise run skill:index:check
+          mise run skill:sync:check
+          mise run skill:toc:check
+
+      - name: Build one archive per skill
+        run: mise run skill:package:all -- --version "${{ steps.version.outputs.value }}"
+
+      # Reconcile the archive count against an independent count of the skill
+      # directories. A glob that quietly missed one would otherwise publish a
+      # short release that looks complete.
+      - name: Reconcile archive count
+        run: |
+          built=$(find dist/skills -name '*.zip' | wc -l)
+          expected=$(find .groups -mindepth 4 -maxdepth 4 -path '*/skills/*/SKILL.md' | wc -l)
+          echo "archives: $built   skills: $expected"
+          if [ "$expected" -eq 0 ] || [ "$built" -ne "$expected" ]; then
+            echo "::error::built $built archives for $expected skills"
+            exit 1
+          fi
+
+      # The release notes are the body of the merged release/<tag> pull request,
+      # written and reviewed before the tag. A tag push without one stops here
+      # rather than publishing a release with no notes.
+      - name: Write release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          notes=""
+          if [ "${{ github.event_name }}" = "push" ]; then
+            notes="$(gh pr list --repo "$GITHUB_REPOSITORY" --state merged \
+              --head "release/$VERSION" --json body --jq '.[0].body // ""')"
+            if [ -z "$notes" ]; then
+              echo "::error::no merged release/$VERSION pull request to take the notes from"
+              exit 1
+            fi
+          fi
+          {
+            if [ -n "$notes" ]; then
+              printf '%s\n\n## Downloads\n\n' "$notes"
+            fi
+            echo "Each skill is packaged on its own. Download the one you want,"
+            echo "then unzip it into \`~/.claude/skills/\`, or upload the zip in"
+            echo "Claude Desktop under Settings, Capabilities, Skills."
+            echo
+            echo "Every archive carries its own \`LICENSE\` and a generated"
+            echo "\`README.md\`, and was validated against the SKILL.md"
+            echo "frontmatter allowlist before it was built. Built from:"
+            echo
+            while read -r id ref; do
+              echo "- \`$id\` at \`$ref\`"
+            done < groups.txt
+            echo
+            echo "| Skill | Size | SHA-256 |"
+            echo "|---|---|---|"
+            python3 -c "
+          import json
+          m = json.load(open('dist/skills/manifest.json'))
+          for s in m['skills']:
+              print(f\"| \`{s['name']}\` | {s['bytes'] // 1024} KiB | \`{s['sha256'][:16]}…\` |\")
+          "
+            echo
+            echo "\`manifest.json\` carries the full checksums."
+          } > release-notes.md
+          cat release-notes.md
+
+      - name: Upload artifacts for a dry run
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-${{ steps.version.outputs.value }}
+          path: |
+            dist/skills/
+            release-notes.md
+
+      # A draft, published by hand once the asset count is checked.
+      - name: Publish draft release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: claude-skills ${{ steps.version.outputs.value }}
+          draft: true
+          body_path: release-notes.md
+          files: |
+            dist/skills/*.zip
+            dist/skills/manifest.json

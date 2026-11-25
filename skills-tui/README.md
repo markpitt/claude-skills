@@ -20,7 +20,7 @@ A production-ready Terminal User Interface (TUI) application for browsing, filte
 ## Building
 
 ### Prerequisites
-- Rust 1.70+ (install from [rustup.rs](https://rustup.rs/))
+- Rust: the repository pins `rust = "stable"` in [`mise.toml`](../mise.toml), so `mise install` gets you the right toolchain. Building without mise needs a recent stable Rust (install from [rustup.rs](https://rustup.rs/)); no minimum supported version is declared, so there is no verified floor to build against.
 
 ### Build Steps
 
@@ -78,10 +78,15 @@ cargo test --test discovery_test     # Run specific test suite
 ```
 
 ### Test Coverage
+
+18 tests, all passing:
+
 - **Discovery Tests** (4 tests): Skill discovery and metadata parsing
 - **Install Tests** (2 tests): File copying and directory structure preservation
 - **Zip Tests** (3 tests): Archive creation and verification
-- **Unit Tests** (3 tests): Frontmatter parsing and extraction
+- **Skill unit tests** (3 tests): Frontmatter parsing and extraction
+- **Feed unit tests** (6 tests): Feeds config defaults, add/remove, save and load,
+  and skill discovery inside a cloned repo
 
 ### Project Structure
 

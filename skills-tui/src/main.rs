@@ -11,7 +11,7 @@ use skills_tui::{
     zip_skill, FeedManager, Skill,
 };
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 fn main() -> Result<()> {
     // Parse command line arguments
@@ -24,7 +24,7 @@ fn main() -> Result<()> {
 
     // Check for --update-feeds flag
     let update_feeds = args.iter().any(|a| a == "--update-feeds" || a == "-u");
-    
+
     // Check for --feeds-config flag
     let feeds_config_path = args
         .iter()
@@ -80,12 +80,12 @@ fn main() -> Result<()> {
 
 /// Load skills from local directory and configured feeds
 fn load_skills(
-    local_path: &PathBuf,
-    feeds_config_path: &PathBuf,
+    local_path: &Path,
+    feeds_config_path: &Path,
     update_feeds: bool,
 ) -> Result<Vec<Skill>> {
     // Try to load feed manager
-    let feed_manager = FeedManager::new(feeds_config_path.clone()).ok();
+    let feed_manager = FeedManager::new(feeds_config_path.to_path_buf()).ok();
 
     if let Some(ref manager) = feed_manager {
         // Update feeds if requested

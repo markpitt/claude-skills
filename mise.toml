@@ -2,17 +2,39 @@
 # https://mise.jdx.dev/
 
 [env]
-# Project root
-SKILLS_ROOT = "{{ cwd }}/skills"
+# Machine-specific overrides. Copy .env.local.example to .env.local and edit;
+# .env.local is git-ignored. A missing file here is not an error, so the
+# defaults below apply as-is on a fresh clone.
+_.file = ".env.local"
+
+# The skills live in seven group directories beside claude-skills; groups.json
+# lists them and scripts/skill_roots.py resolves them. Set SKILLS_ROOTS (a
+# colon-separated list of skills directories) to point the tooling elsewhere.
 TUI_ROOT = "{{ cwd }}/skills-tui"
+
+# Evaluation harness. Defaults assume Ollama on this machine. Point them at
+# whatever inference endpoint you have, via .env.local or by exporting the
+# variable; nothing here should name a specific host.
+OLLAMA_HOST = "{{ env.OLLAMA_HOST | default(value='http://localhost:11434') }}"
+OLLAMA_MODEL = "{{ env.OLLAMA_MODEL | default(value='devstral-small-2:latest') }}"
+OLLAMA_JUDGE_MODEL = "{{ env.OLLAMA_JUDGE_MODEL | default(value='devstral-small-2:latest') }}"
+PROMPTFOO_MODEL = "{{ env.PROMPTFOO_MODEL | default(value='devstral-small-2:latest') }}"
+PROMPTFOO_JUDGE_MODEL = "{{ env.PROMPTFOO_JUDGE_MODEL | default(value='devstral-small-2:latest') }}"
+PROMPTFOO_BASE_URL = "{{ env.PROMPTFOO_BASE_URL | default(value='http://localhost:11434/v1') }}"
+PROMPTFOO_PROVIDER_API_KEY = "{{ env.PROMPTFOO_PROVIDER_API_KEY | default(value='ollama') }}"
+PROMPTFOO_KEEP_ALIVE = "30m"
+PROMPTFOO_THINK = "false"
+SKILL_EVAL_KEEP_ALIVE = "30m"
 
 [tools]
 # Rust toolchain for TUI
-rust = "1.75"
+rust = "stable"
 # Python for scripts
-python = "3.12"
+python = "3.14"
+# uv runs the validator with its dependencies, no virtualenv to maintain
+uv = "latest"
 # Node.js for website
-node = "22"
+node = "24"
 
 [tasks.build]
 description = "Build the skills-tui application"
@@ -20,9 +42,12 @@ dir = "skills-tui"
 run = "cargo build --release"
 
 [tasks.dev]
-description = "Run TUI in development mode"
+description = "Run TUI in development mode against one group (default claude-skills-dev-environment)"
 dir = "skills-tui"
-run = "cargo run -- ../skills"
+usage = '''
+arg "[group]" help="A group id from groups.json" default="claude-skills-dev-environment"
+'''
+run = "cargo run -- \"../../${usage_group}/skills\""
 
 [tasks.test]
 description = "Run all tests"
@@ -72,36 +97,89 @@ run = "python scripts/package_skill.py"
 usage = "mise run skill:package <skill-path> [output-dir]"
 
 [tasks."skill:validate"]
-description = "Validate all skills in the repository"
-run = """
-#!/usr/bin/env bash
-echo "Validating skills..."
-errors=0
-for skill_dir in skills/*/; do
-    if [ -d "$skill_dir" ]; then
-        skill_name=$(basename "$skill_dir")
-        if [ -f "${skill_dir}SKILL.md" ]; then
-            # Check frontmatter exists
-            if head -n 1 "${skill_dir}SKILL.md" | grep -q "^---$"; then
-                echo "✓ $skill_name"
-            else
-                echo "✗ $skill_name - Missing frontmatter"
-                ((errors++))
-            fi
-        else
-            echo "✗ $skill_name - Missing SKILL.md"
-            ((errors++))
-        fi
-    fi
-done
-echo ""
-if [ $errors -eq 0 ]; then
-    echo "All skills valid!"
-else
-    echo "$errors error(s) found"
-    exit 1
-fi
-"""
+description = "Validate all skills: frontmatter, naming, resource references"
+run = "uv run --with pyyaml python scripts/validate_skills.py"
+
+[tasks."skill:validate:strict"]
+description = "Validate all skills, treating style warnings as errors"
+run = "uv run --with pyyaml python scripts/validate_skills.py --strict"
+
+[tasks."skill:paths"]
+description = "Print the paths the validator resolves, to debug root derivation"
+run = "uv run --with pyyaml python scripts/validate_skills.py paths"
+
+[tasks."skill:index"]
+description = "Regenerate the skill tables in each group README and CATALOGUE.md"
+run = "uv run --with pyyaml python scripts/generate_skill_index.py"
+
+[tasks."skill:index:check"]
+description = "Fail if a group README or CATALOGUE.md is out of date with the skills on disk"
+run = "uv run --with pyyaml python scripts/generate_skill_index.py --check"
+
+[tasks."skill:package:all"]
+description = "Build one distributable zip per skill into dist/skills"
+run = "uv run --with pyyaml python scripts/package_skills.py"
+
+[tasks."skill:toc"]
+description = "Add a contents list to reference files over 600 lines"
+run = "uv run python scripts/add_reference_toc.py"
+
+[tasks."skill:toc:check"]
+description = "Fail if a large reference file has no contents list"
+run = "uv run python scripts/add_reference_toc.py --check"
+
+[tasks."skill:sync"]
+description = "Write each skill's LICENSE, license frontmatter key and README.md"
+run = "uv run --with pyyaml python scripts/sync_skill_packaging.py"
+
+[tasks."skill:sync:check"]
+description = "Fail if any skill's LICENSE or generated README.md is out of date"
+run = "uv run --with pyyaml python scripts/sync_skill_packaging.py --check"
+
+[tasks."skill:test:validation"]
+description = "Unit tests for the validator and prompt loader (no network, no model)"
+run = "uv run --with pytest --with pyyaml python -m pytest tests/validation/ -q"
+
+# Everything below needs a local Ollama or a GITHUB_TOKEN and takes minutes
+# rather than seconds, so none of it is wired into `ci`. Run it deliberately.
+# Trigger and quality coverage is 40 of 42 skills; see tests/README.md.
+
+[tasks."skill:test:static"]
+description = "Static validation plus markdownlint on all SKILL.md files"
+run = "bash scripts/skill_test_static.sh"
+
+[tasks."skill:test:triggers"]
+description = "PromptFoo trigger tests: does the skill activate on the right prompts?"
+run = "bash scripts/promptfoo/run_skill_suite.sh triggers"
+
+[tasks."skill:test:triggers:skill"]
+description = "PromptFoo trigger tests for one skill"
+usage = '''
+arg "<skill>" help="Skill name in kebab-case, e.g. rust-guru"
+'''
+run = "bash scripts/promptfoo/run_skill_suite.sh triggers \"${usage_skill?}\""
+
+[tasks."skill:test:quality"]
+description = "DeepEval output quality tests (needs Ollama or GITHUB_TOKEN)"
+run = "uv run pytest tests/eval/ -v --tb=short"
+
+[tasks."skill:test:quality:skill"]
+description = "DeepEval output quality tests for one skill"
+usage = '''
+arg "<skill>" help="Skill name in kebab-case, e.g. tdd-guru"
+'''
+run = '''
+test_name="$(printf '%s' "${usage_skill?}" | tr '-' '_')"
+uv run pytest "tests/eval/test_${test_name}.py" -v --tb=short
+'''
+
+[tasks."skill:snapshot:update"]
+description = "Write the snapshot baseline from the latest PromptFoo results"
+run = "bash scripts/promptfoo/run_skill_suite.sh snapshot"
+
+[tasks."skill:snapshot:compare"]
+description = "Compare against the snapshot baseline to detect output drift"
+run = "uv run python tests/snapshots/compare.py"
 
 [tasks."skill:list"]
 description = "List all available skills"
@@ -109,9 +187,9 @@ run = """
 #!/usr/bin/env bash
 echo "Available Skills:"
 echo "================="
-for skill_dir in skills/*/; do
+for skill_dir in ../*/skills/*/; do
     if [ -d "$skill_dir" ] && [ -f "${skill_dir}SKILL.md" ]; then
-        skill_name=$(basename "$skill_dir")
+        skill_name="$(basename "$(dirname "$(dirname "$skill_dir")")")/$(basename "$skill_dir")"
         description=$(grep "^description:" "${skill_dir}SKILL.md" | sed 's/description: *//' | head -1 | cut -c1-60)
         if [ -n "$description" ]; then
             printf "  %-25s %s...\n" "$skill_name" "$description"
@@ -137,7 +215,7 @@ run = "python scripts/update_feeds.py"
 
 [tasks.ci]
 description = "Run all CI checks"
-depends = ["format-check", "lint", "test", "skill:validate"]
+depends = ["format-check", "lint", "test", "skill:validate", "skill:index:check", "skill:sync:check", "skill:toc:check", "skill:test:validation"]
 
 [tasks.release]
 description = "Build release binaries"

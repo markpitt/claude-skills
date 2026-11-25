@@ -1,0 +1,59 @@
+name: Validate Skills
+
+# Every pull request and every push to main, with no paths filter. Static Validation is a required
+# check on main, and a required check that a filter skips leaves a pull request waiting for ever.
+# The skills themselves live in the seven group repositories, so a change there cannot trigger this
+# run; the release that brings it here does.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  SKILL_GROUPS_DIR: ${{ github.workspace }}/.groups
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Static Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      # This repository is the index. Check the seven groups in groups.json out under .groups/
+      # at their main, which is what the site shows. The validator's own unit tests
+      # (tests/validation/) stay in the monorepo and run there.
+      - name: Check out the skill groups
+        run: bash scripts/checkout_groups.sh .groups
+
+      # Printed before validating so a failure caused by the root resolving
+      # somewhere unexpected is diagnosable from the log alone.
+      - name: Show resolved paths
+        run: mise run skill:paths
+
+      - name: Validate SKILL.md files
+        run: mise run skill:validate
+
+      # CATALOGUE.md and each group's table are generated. This fails when a
+      # skill is added or renamed and the index was not rebuilt.
+      - name: Check the skill index is current
+        run: mise run skill:index:check
+
+      # Each skill ships its own LICENSE and a generated README, so the
+      # directory is self-contained when copied or zipped on its own.
+      - name: Check each skill is packageable on its own
+        run: mise run skill:sync:check
+
+      # Large reference files get previewed with head -100 rather than read
+      # whole, so a contents list is what shows their full scope.
+      - name: Check large reference files have a contents list
+        run: mise run skill:toc:check
