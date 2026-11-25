@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  SKILL_GROUPS_DIR: ${{ github.workspace }}/.groups
+
 permissions:
   contents: read
   pages: write
@@ -22,10 +25,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      # This repository is the index; the skills live in the seven group repositories listed in
+      # groups.json. Check each one out under .groups/<id>/ and point the build and the tests at
+      # them with SKILL_GROUPS_DIR. The groups are public, so no token is needed. Keep this list
+      # in step with groups.json: test_docs_site.py checks that it is.
+      - { name: Checkout claude-skills-dotnet, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-dotnet, path: .groups/claude-skills-dotnet } }
+      - { name: Checkout claude-skills-language-gurus, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-language-gurus, path: .groups/claude-skills-language-gurus } }
+      - { name: Checkout claude-skills-engineering-practices, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-engineering-practices, path: .groups/claude-skills-engineering-practices } }
+      - { name: Checkout claude-skills-api, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-api, path: .groups/claude-skills-api } }
+      - { name: Checkout claude-skills-ai-engineering, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-ai-engineering, path: .groups/claude-skills-ai-engineering } }
+      - { name: Checkout claude-skills-dev-environment, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-dev-environment, path: .groups/claude-skills-dev-environment } }
+      - { name: Checkout claude-skills-gcse-tutors, uses: actions/checkout@v4, with: { repository: markpitt/claude-skills-gcse-tutors, path: .groups/claude-skills-gcse-tutors } }
+
+      # mise owns the Node version, so the site is built with the same
+      # toolchain as everything else rather than a second pinned version.
+      - uses: jdx/mise-action@v2
+
+      # The tests that assert the generated HTML (tests/validation/test_docs_site.py) stay in the
+      # monorepo and run there before a release reaches this repository. Here the validator is the
+      # gate: a skill that does not parse must not reach the site.
+      - name: Validate the skills
+        run: mise run skill:validate
 
       - name: Build documentation
         run: node scripts/build-docs.js

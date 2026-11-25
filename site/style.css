@@ -1,0 +1,156 @@
+/* claude-skills Pages site, in the markpitt.dev brand.
+ *
+ * Tokens only: every colour, size and radius is a custom property from tokens.css, a verbatim
+ * copy of the brand's generated token sheet. The brand's design of this site uses this same
+ * stylesheet; change both together.
+ *
+ * Every rule sits under .cs-site so the design sheet can draw the site beside other apps
+ * without the two style sheets touching.
+ */
+
+.cs-site {
+  margin: 0;
+  background: var(--surface-body);
+  color: var(--ink);
+  font: var(--type-ui);
+  -webkit-font-smoothing: antialiased;
+}
+.cs-site *, .cs-site *::before, .cs-site *::after { box-sizing: border-box; }
+.cs-site h1, .cs-site h2, .cs-site h3, .cs-site p, .cs-site ul, .cs-site ol, .cs-site pre, .cs-site figure { margin: 0; }
+
+.cs-site a { color: var(--accent-text); text-underline-offset: 3px; }
+.cs-site a:hover { text-decoration-thickness: 2px; }
+.cs-site :focus-visible { outline: 2px solid var(--accent-mark); outline-offset: 2px; border-radius: var(--radius-sm); }
+
+.cs-site .skip { position: absolute; left: var(--space-4); top: -100px; padding: var(--space-2) var(--space-4); background: var(--accent-text); color: var(--on-accent-text); font: var(--type-ui-label); text-decoration: none; border-radius: var(--radius-sm); z-index: 10; }
+.cs-site .skip:focus { top: var(--space-2); }
+
+.cs-site .wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--space-6); }
+
+/* Header: mark, wordmark, product name, then the links and the theme control. */
+.cs-site .cs-top { position: sticky; top: 0; z-index: 5; background: var(--surface-body); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .cs-top .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); min-height: 60px; flex-wrap: wrap; }
+.cs-site .lockup { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--ink); text-decoration: none; }
+.cs-site .lockup .brand { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--ink); }
+.cs-site .lockup svg { height: 20px; width: auto; display: block; }
+.cs-site .lockup .sep { color: var(--border-control); font-weight: 400; }
+.cs-site .lockup .product { font: 600 18px/1.2 var(--font-sans); color: var(--ink); text-decoration: none; }
+.cs-site .cs-top nav { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+.cs-site .cs-top nav a { color: var(--muted); text-decoration: none; font: var(--type-small); }
+.cs-site .cs-top nav a:hover, .cs-site .cs-top nav a[aria-current] { color: var(--ink); }
+.cs-site .theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--border-subtle); border-radius: var(--radius-full); background: none; color: var(--muted); cursor: pointer; }
+.cs-site .theme-toggle:hover { color: var(--ink); }
+.cs-site .theme-toggle svg { width: 20px; height: 20px; display: none; }
+.cs-site .theme-toggle[data-theme-state="system"] .i-system,
+.cs-site .theme-toggle[data-theme-state="light"] .i-light,
+.cs-site .theme-toggle[data-theme-state="dark"] .i-dark { display: block; }
+
+/* Type */
+.cs-site h1 { font: var(--type-h1); letter-spacing: var(--type-h1-tracking); }
+.cs-site h2 { font: var(--type-h2); }
+.cs-site h3 { font: var(--type-h3); }
+.cs-site code, .cs-site .mono { font-family: var(--font-mono); font-size: 0.92em; }
+.cs-site .muted { color: var(--muted); }
+.cs-site .small { font: var(--type-small); }
+.cs-site .label { font: var(--type-ui-label); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cs-site .num { font-variant-numeric: tabular-nums; }
+
+/* Home: intro */
+.cs-site main { display: block; }
+.cs-site .cs-intro { padding: var(--space-16) 0 var(--space-12); }
+.cs-site .cs-intro h1 { margin-bottom: var(--space-4); }
+.cs-site .cs-intro .cs-lede { font: var(--type-body); max-width: 65ch; }
+.cs-site .cs-intro .cs-lede + .cs-lede { margin-top: var(--space-4); }
+.cs-site .facts { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); padding: 0; list-style: none; font: var(--type-small); color: var(--muted); }
+.cs-site .facts strong { color: var(--ink); font-weight: 600; }
+
+.cs-site .section { padding: var(--space-12) 0; border-top: 1px solid var(--border-subtle); }
+.cs-site .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-6); }
+.cs-site .section-head p { max-width: 65ch; }
+
+/* Home: the seven groups */
+.cs-site .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-4); padding: 0; list-style: none; }
+.cs-site .group-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.cs-site .group-card h3 a { color: var(--ink); text-decoration: none; }
+.cs-site .group-card h3 a:hover { text-decoration: underline; }
+.cs-site .group-card p { color: var(--muted); flex: 1; }
+.cs-site .group-card .foot { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); font: var(--type-small); }
+.cs-site .group-card .count { color: var(--ink); font-weight: 600; }
+.cs-site .repo { font-family: var(--font-mono); font-size: 13px; }
+
+/* Home: every skill, by group */
+.cs-site .filter { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-6); }
+.cs-site .filter label { font: var(--type-ui-label); }
+.cs-site .filter input { width: min(360px, 100%); padding: var(--space-2) var(--space-3); font: var(--type-ui); color: var(--ink); background: var(--surface-body); border: 1px solid var(--border-control); border-radius: var(--radius-sm); }
+.cs-site .filter input::placeholder { color: var(--muted); }
+.cs-site .filter output { font: var(--type-small); color: var(--muted); }
+.cs-site .catalogue-group { margin-bottom: var(--space-8); }
+.cs-site .catalogue-group > header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .skill-list { padding: 0; list-style: none; }
+.cs-site .skill-list li { display: grid; grid-template-columns: 260px 1fr 64px; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-subtle); }
+.cs-site .skill-list .name { font-family: var(--font-mono); font-size: 14px; overflow-wrap: anywhere; }
+.cs-site .skill-list .desc { color: var(--muted); }
+.cs-site .skill-list .ver { font: var(--type-small); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.cs-site .empty { padding: var(--space-6); text-align: center; color: var(--muted); background: var(--surface-card); border-radius: var(--radius-md); }
+
+/* Code */
+.cs-site pre { font: var(--type-code); background: var(--surface-pill); color: var(--ink); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+.cs-site pre code { font-size: inherit; }
+.cs-site pre .c { color: var(--muted); }
+.cs-site :not(pre) > code { background: var(--surface-pill); padding: 1px 6px; border-radius: var(--radius-sm); }
+
+/* Buttons */
+.cs-site .btn { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); font: var(--type-ui-label); border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-control); color: var(--ink); background: none; }
+.cs-site .btn.primary { background: var(--accent-text); border-color: var(--accent-text); color: var(--on-accent-text); }
+.cs-site .btn:hover { text-decoration: underline; }
+.cs-site .chip { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: var(--radius-full); background: var(--surface-pill); color: var(--ink); font: var(--type-ui-label); }
+
+/* Skill page */
+.cs-site .crumbs { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-8) 0 var(--space-4); margin: 0; list-style: none; font: var(--type-small); color: var(--muted); }
+.cs-site .crumbs li + li::before { content: "/"; margin-right: var(--space-2); color: var(--border-control); }
+.cs-site .crumbs a { color: var(--muted); }
+.cs-site .skill-head h1 { font: 700 36px/1.15 var(--font-mono); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.cs-site .skill-head .cs-lede { font: var(--type-body); max-width: 65ch; margin-top: var(--space-4); }
+.cs-site .skill-head .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-4); }
+.cs-site .skill-head .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+.cs-site .skill-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--space-12); padding: var(--space-12) 0 var(--space-16); }
+.cs-site .skill-body aside { display: flex; flex-direction: column; gap: var(--space-6); }
+.cs-site .skill-body aside section { padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.cs-site .skill-body aside h2 { font: var(--type-ui-label); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: var(--space-3); }
+.cs-site .skill-body aside pre { font-size: 13px; padding: var(--space-3); white-space: pre-wrap; overflow-wrap: anywhere; }
+.cs-site .skill-body aside p { font: var(--type-small); color: var(--muted); margin-top: var(--space-3); }
+.cs-site .siblings { padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-1); }
+.cs-site .siblings a { font-family: var(--font-mono); font-size: 13px; }
+.cs-site .siblings [aria-current] { color: var(--ink); text-decoration: none; }
+
+/* Rendered SKILL.md: a reading view, held to about 65 characters a line. */
+.cs-site .prose { font: var(--type-body); max-width: 70ch; }
+.cs-site .prose > * + * { margin-top: var(--space-4); }
+.cs-site .prose h1, .cs-site .prose h2 { font: var(--type-h2); margin-top: var(--space-12); }
+.cs-site .prose h3 { font: var(--type-h3); margin-top: var(--space-8); }
+.cs-site .prose h4 { font: 600 17px/1.4 var(--font-sans); margin-top: var(--space-6); }
+.cs-site .prose > :first-child { margin-top: 0; }
+.cs-site .prose ul, .cs-site .prose ol { padding-left: var(--space-6); }
+.cs-site .prose li + li { margin-top: var(--space-1); }
+.cs-site .prose blockquote { margin: var(--space-4) 0 0; padding-left: var(--space-4); border-left: 2px solid var(--border-control); color: var(--muted); }
+.cs-site .prose pre { font-size: 14px; }
+.cs-site .table-wrap { overflow-x: auto; }
+.cs-site .prose table { border-collapse: collapse; width: 100%; font: var(--type-ui); }
+.cs-site .prose th, .cs-site .prose td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .prose th { font: var(--type-ui-label); color: var(--muted); }
+.cs-site .doc-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-3); margin-bottom: var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+
+/* Footer */
+.cs-site .foot-bar { border-top: 1px solid var(--border-subtle); padding: var(--space-8) 0; font: var(--type-small); color: var(--muted); }
+.cs-site .foot-bar .wrap { display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .cs-site .cs-top .wrap { padding-top: var(--space-3); padding-bottom: var(--space-3); gap: var(--space-3); }
+  .cs-site .cs-top nav { gap: var(--space-4); }
+  .cs-site .cs-intro { padding: var(--space-12) 0 var(--space-8); }
+  .cs-site h1 { font-size: 32px; }
+  .cs-site .skill-head h1 { font-size: 26px; }
+  .cs-site .skill-list li { grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); }
+  .cs-site .skill-list .desc { grid-column: 1 / -1; grid-row: 2; }
+  .cs-site .skill-body { grid-template-columns: 1fr; gap: var(--space-8); }
+}

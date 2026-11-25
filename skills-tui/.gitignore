@@ -1,7 +1,9 @@
 # Rust build artifacts
 /target
 **/*.rs.bk
-Cargo.lock
+
+# Cargo.lock is committed: skills-tui is a binary crate, so the lockfile is
+# what makes builds reproducible across machines and CI.
 
 # IDE and editor files
 .vscode/
