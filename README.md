@@ -7,7 +7,7 @@
 
 The Claude Skills I use, packaged so you can drop them into Claude Code or Claude Desktop. There are 70 of them, in seven group repositories. They cover .NET, Python, TypeScript, Rust, Go and shell; APIs such as Azure DevOps, GitHub, Microsoft Graph and Home Assistant; developer tooling such as mise and devcontainers; and nine GCSE revision tutors. Each one has been used on real work before it landed here; the ones that didn't earn their place were deleted.
 
-This repository holds no skills itself. It links the groups, builds one zip per skill for each release, publishes the [skills site](https://markpitt.github.io/claude-skills/), and keeps the shared toolchain: the validator, the packaging scripts and skills-tui.
+This repository holds no skills itself. It links the groups, builds one zip per skill for each release, publishes the [skills site](https://markpitt.dev/claude-skills/), and keeps the shared toolchain: the validator, the packaging scripts and skills-tui.
 
 ## The groups
 
@@ -21,7 +21,7 @@ This repository holds no skills itself. It links the groups, builds one zip per 
 | [Developer environment](https://github.com/markpitt/claude-skills-dev-environment) | 14 | Tooling around the code: mise, devcontainers, terminal multiplexers, git protection, hosting and markdown. |
 | [GCSE tutors](https://github.com/markpitt/claude-skills-gcse-tutors) | 9 | Nine GCSE revision tutors, frozen at the 2026 exam year. |
 
-Every skill, with a one-line summary, is in [CATALOGUE.md](CATALOGUE.md) and on the [site](https://markpitt.github.io/claude-skills/).
+Every skill, with a one-line summary, is in [CATALOGUE.md](CATALOGUE.md) and on the [site](https://markpitt.dev/claude-skills/).
 
 ## Install a skill
 
