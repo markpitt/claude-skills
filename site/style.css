@@ -6,13 +6,21 @@
  *
  * Every rule sits under .cs-site so the design sheet can draw the site beside other apps
  * without the two style sheets touching.
+ *
+ * The site serves at markpitt.dev/claude-skills, beneath the main site (markpitt.github.io), so
+ * its frame copies the main site's measurements: the same header, nav, theme control, footer,
+ * content width and section rhythm. Where this file uses a literal size it is one of the main
+ * site's (Tailwind) values, named in a comment.
  */
+
+/* The main site's hairline: ink at 10%, over whatever surface is behind it. */
+.cs-site { --hairline: color-mix(in oklab, var(--ink) 10%, transparent); }
 
 .cs-site {
   margin: 0;
   background: var(--surface-body);
   color: var(--ink);
-  font: var(--type-ui);
+  font: 400 16px/1.5 var(--font-sans); /* the main site's body: Tailwind's 16px base */
   -webkit-font-smoothing: antialiased;
 }
 .cs-site *, .cs-site *::before, .cs-site *::after { box-sizing: border-box; }
@@ -22,28 +30,52 @@
 .cs-site a:hover { text-decoration-thickness: 2px; }
 .cs-site :focus-visible { outline: 2px solid var(--accent-mark); outline-offset: 2px; border-radius: var(--radius-sm); }
 
-.cs-site .skip { position: absolute; left: var(--space-4); top: -100px; padding: var(--space-2) var(--space-4); background: var(--accent-text); color: var(--on-accent-text); font: var(--type-ui-label); text-decoration: none; border-radius: var(--radius-sm); z-index: 10; }
-.cs-site .skip:focus { top: var(--space-2); }
+.cs-site .skip { position: fixed; left: var(--space-4); top: -100px; padding: var(--space-3) 20px; background: var(--surface-body); color: var(--accent-text); border: 2px solid var(--accent-text); font: var(--type-ui-label); text-decoration: none; border-radius: var(--radius-sm); z-index: 100; }
+.cs-site .skip:focus { top: var(--space-4); }
 
-.cs-site .wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--space-6); }
+/* Widths, as the main site: max-w-5xl (1024px). Its nav holds the gutter inside the 1024px, its
+ * sections outside it, so the lockup sits 24px in from the content edge on both sites. */
+.cs-site .wrap { max-width: calc(1024px + 2 * var(--space-6)); margin: 0 auto; padding: 0 var(--space-6); }
+.cs-site .wrap-nav { max-width: 1024px; margin: 0 auto; padding: var(--space-4) var(--space-6); }
 
-/* Header: mark, wordmark, product name, then the links and the theme control. */
-.cs-site .cs-top { position: sticky; top: 0; z-index: 5; background: var(--surface-body); border-bottom: 1px solid var(--border-subtle); }
-.cs-site .cs-top .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); min-height: 60px; flex-wrap: wrap; }
-.cs-site .lockup { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--ink); text-decoration: none; }
-.cs-site .lockup .brand { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--ink); }
+/* Header: the main site's nav, mark and wordmark on the left, its links and theme control on
+ * the right. Translucent over a blur, 67px tall with its hairline. */
+.cs-site .cs-top { position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--surface-body) 80%, transparent); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border-bottom: 1px solid var(--hairline); }
+.cs-site .cs-top .wrap-nav { display: flex; align-items: center; justify-content: space-between; }
+.cs-site .lockup { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--ink); text-decoration: none; }
 .cs-site .lockup svg { height: 20px; width: auto; display: block; }
-.cs-site .lockup .sep { color: var(--border-control); font-weight: 400; }
-.cs-site .lockup .product { font: 600 18px/1.2 var(--font-sans); color: var(--ink); text-decoration: none; }
-.cs-site .cs-top nav { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
-.cs-site .cs-top nav a { color: var(--muted); text-decoration: none; font: var(--type-small); }
-.cs-site .cs-top nav a:hover, .cs-site .cs-top nav a[aria-current] { color: var(--ink); }
-.cs-site .theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--border-subtle); border-radius: var(--radius-full); background: none; color: var(--muted); cursor: pointer; }
-.cs-site .theme-toggle:hover { color: var(--ink); }
+.cs-site .nav-right { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-6); }
+.cs-site .nav-menu { position: relative; }
+.cs-site .nav-menu-links { display: none; gap: var(--space-1) var(--space-6); justify-content: flex-end; flex-wrap: wrap; padding: 0; margin: 0; list-style: none; font: 400 14px/20px var(--font-sans); }
+.cs-site .nav-menu-links a { color: var(--muted); text-decoration: none; transition: color 150ms; }
+.cs-site .nav-menu-links a:hover, .cs-site .nav-menu-links a[aria-current] { color: var(--ink); }
+.cs-site .nav-menu[open] .nav-menu-links { display: flex; position: absolute; top: calc(100% + var(--space-2)); right: 0; flex-direction: column; align-items: flex-end; gap: var(--space-2); padding: var(--space-4) 20px; background: var(--surface-card); border: 1px solid var(--hairline); border-radius: var(--radius-md); box-shadow: 0 10px 30px -10px color-mix(in oklab, var(--ink) 30%, transparent); }
+.cs-site .nav-menu-toggle, .cs-site .theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--hairline); border-radius: var(--radius-full); background: none; color: var(--muted); cursor: pointer; list-style: none; transition: color 150ms; }
+.cs-site .nav-menu-toggle:hover, .cs-site .theme-toggle:hover { color: var(--ink); }
+.cs-site .nav-menu-toggle::marker, .cs-site .nav-menu-toggle::-webkit-details-marker { display: none; }
+.cs-site .nav-menu-toggle svg { width: 20px; height: 20px; }
+.cs-site .nav-menu-toggle .i-close, .cs-site .nav-menu[open] .nav-menu-toggle .i-open { display: none; }
+.cs-site .nav-menu[open] .nav-menu-toggle .i-close { display: block; }
 .cs-site .theme-toggle svg { width: 20px; height: 20px; display: none; }
 .cs-site .theme-toggle[data-theme-state="system"] .i-system,
 .cs-site .theme-toggle[data-theme-state="light"] .i-light,
 .cs-site .theme-toggle[data-theme-state="dark"] .i-dark { display: block; }
+/* The main site's collapse width, 647px (its global.css and hamburger-nav.spec.ts): the links show
+ * in one row from here up, behind the menu button below it. Move the two together. */
+@media (min-width: 647px) {
+  .cs-site .nav-menu-toggle { display: none; }
+  .cs-site .nav-menu-links { display: flex !important; position: static; }
+  .cs-site .nav-menu::details-content { content-visibility: visible; }
+}
+
+/* Sub-bar: this site's own name and sections, under the shared header. Project names are mono on
+ * the main site (its Work cards), so the name is too. */
+.cs-site .cs-sub { border-bottom: 1px solid var(--hairline); }
+.cs-site .cs-sub .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-6); flex-wrap: wrap; padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.cs-site .cs-sub .product { font: 600 14px/20px var(--font-mono); color: var(--ink); text-decoration: none; }
+.cs-site .cs-sub nav { display: flex; align-items: center; gap: var(--space-2) var(--space-6); flex-wrap: wrap; font: 400 14px/20px var(--font-sans); }
+.cs-site .cs-sub nav a { color: var(--muted); text-decoration: none; transition: color 150ms; }
+.cs-site .cs-sub nav a:hover, .cs-site .cs-sub nav a[aria-current] { color: var(--ink); }
 
 /* Type */
 .cs-site h1 { font: var(--type-h1); letter-spacing: var(--type-h1-tracking); }
@@ -64,17 +96,19 @@
 .cs-site .facts { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); padding: 0; list-style: none; font: var(--type-small); color: var(--muted); }
 .cs-site .facts strong { color: var(--ink); font-weight: 600; }
 
-.cs-site .section { padding: var(--space-12) 0; border-top: 1px solid var(--border-subtle); }
-.cs-site .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-6); }
-.cs-site .section-head p { max-width: 65ch; }
+.cs-site .section { padding: var(--space-24) 0; border-top: 1px solid var(--hairline); }
+.cs-site .section-head { margin-bottom: var(--space-8); }
+.cs-site .section-head p { max-width: 65ch; margin-top: var(--space-4); color: var(--muted); }
+/* Section headings are the main site's eyebrows: mono, 12px, uppercase, widest tracking, accent. */
+.cs-site .section-head h2 { font: 400 12px/16px var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text); }
 
 /* Home: the seven groups */
 .cs-site .groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-4); padding: 0; list-style: none; }
-.cs-site .group-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.cs-site .group-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--hairline); border-radius: var(--radius-md); }
 .cs-site .group-card h3 a { color: var(--ink); text-decoration: none; }
 .cs-site .group-card h3 a:hover { text-decoration: underline; }
 .cs-site .group-card p { color: var(--muted); flex: 1; }
-.cs-site .group-card .foot { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); font: var(--type-small); }
+.cs-site .group-card .foot { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--hairline); font: var(--type-small); }
 .cs-site .group-card .count { color: var(--ink); font-weight: 600; }
 .cs-site .repo { font-family: var(--font-mono); font-size: 13px; }
 
@@ -85,9 +119,9 @@
 .cs-site .filter input::placeholder { color: var(--muted); }
 .cs-site .filter output { font: var(--type-small); color: var(--muted); }
 .cs-site .catalogue-group { margin-bottom: var(--space-8); }
-.cs-site .catalogue-group > header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .catalogue-group > header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-2); border-bottom: 1px solid var(--hairline); }
 .cs-site .skill-list { padding: 0; list-style: none; }
-.cs-site .skill-list li { display: grid; grid-template-columns: 260px 1fr 64px; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-subtle); }
+.cs-site .skill-list li { display: grid; grid-template-columns: 260px 1fr 64px; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--hairline); }
 .cs-site .skill-list .name { font-family: var(--font-mono); font-size: 14px; overflow-wrap: anywhere; }
 .cs-site .skill-list .desc { color: var(--muted); }
 .cs-site .skill-list .ver { font: var(--type-small); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
@@ -103,7 +137,8 @@
 .cs-site .btn { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); font: var(--type-ui-label); border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border-control); color: var(--ink); background: none; }
 .cs-site .btn.primary { background: var(--accent-text); border-color: var(--accent-text); color: var(--on-accent-text); }
 .cs-site .btn:hover { text-decoration: underline; }
-.cs-site .chip { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: var(--radius-full); background: var(--surface-pill); color: var(--ink); font: var(--type-ui-label); }
+/* The main site's tech tags: mono 12px, muted, pill surface, small radius. */
+.cs-site .chip { display: inline-flex; align-items: center; padding: 2px var(--space-2); border-radius: var(--radius-sm); background: var(--surface-pill); color: var(--muted); font: 400 12px/16px var(--font-mono); }
 
 /* Skill page */
 .cs-site .crumbs { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-8) 0 var(--space-4); margin: 0; list-style: none; font: var(--type-small); color: var(--muted); }
@@ -115,7 +150,7 @@
 .cs-site .skill-head .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .cs-site .skill-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--space-12); padding: var(--space-12) 0 var(--space-16); }
 .cs-site .skill-body aside { display: flex; flex-direction: column; gap: var(--space-6); }
-.cs-site .skill-body aside section { padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
+.cs-site .skill-body aside section { padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--hairline); border-radius: var(--radius-md); }
 .cs-site .skill-body aside h2 { font: var(--type-ui-label); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: var(--space-3); }
 .cs-site .skill-body aside pre { font-size: 13px; padding: var(--space-3); white-space: pre-wrap; overflow-wrap: anywhere; }
 .cs-site .skill-body aside p { font: var(--type-small); color: var(--muted); margin-top: var(--space-3); }
@@ -136,9 +171,9 @@
 .cs-site .prose pre { font-size: 14px; }
 .cs-site .table-wrap { overflow-x: auto; }
 .cs-site .prose table { border-collapse: collapse; width: 100%; font: var(--type-ui); }
-.cs-site .prose th, .cs-site .prose td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .prose th, .cs-site .prose td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--hairline); }
 .cs-site .prose th { font: var(--type-ui-label); color: var(--muted); }
-.cs-site .doc-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-3); margin-bottom: var(--space-6); border-bottom: 1px solid var(--border-subtle); }
+.cs-site .doc-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-3); margin-bottom: var(--space-6); border-bottom: 1px solid var(--hairline); }
 
 /* Syntax highlighting, from the brand's code mapping (personal-brand products.md, "Code and
  * editors"): keywords in accent-text, strings in success, numbers in warning, comments in muted. */
@@ -151,7 +186,7 @@
 .cs-site .files, .cs-site .files ul { padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-1); }
 .cs-site .files li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
 .cs-site .files li.dir { display: block; margin-top: var(--space-2); }
-.cs-site .files ul { margin-top: var(--space-1); padding-left: var(--space-3); border-left: 1px solid var(--border-subtle); }
+.cs-site .files ul { margin-top: var(--space-1); padding-left: var(--space-3); border-left: 1px solid var(--hairline); }
 .cs-site .files a, .cs-site .files .dir-name { font-family: var(--font-mono); font-size: 13px; overflow-wrap: anywhere; min-width: 0; }
 .cs-site .files .dir-name { color: var(--muted); }
 .cs-site .files [aria-current] { color: var(--ink); font-weight: 700; text-decoration: none; }
@@ -161,17 +196,17 @@
 .cs-site .file-head h1 { font-size: 28px; }
 .cs-site .code-view { display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--surface-pill); border-radius: var(--radius-md); }
 .cs-site .code-view pre { font: var(--type-code); font-size: 14px; background: none; border-radius: 0; white-space: pre; }
-.cs-site .code-view .gutter { color: var(--muted); text-align: right; user-select: none; padding-right: var(--space-3); border-right: 1px solid var(--border-subtle); }
+.cs-site .code-view .gutter { color: var(--muted); text-align: right; user-select: none; padding-right: var(--space-3); border-right: 1px solid var(--hairline); }
 .cs-site .code-view .code { overflow-x: auto; }
 .cs-site .code-view .code:focus-visible { outline-offset: -2px; }
 
 /* Footer */
-.cs-site .foot-bar { border-top: 1px solid var(--border-subtle); padding: var(--space-8) 0; font: var(--type-small); color: var(--muted); }
-.cs-site .foot-bar .wrap { display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.cs-site .foot-bar { border-top: 1px solid var(--hairline); padding: var(--space-8) 0; font: 400 12px/16px var(--font-mono); color: var(--muted); }
+.cs-site .foot-bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.cs-site .foot-bar a { color: var(--muted); text-decoration: none; }
+.cs-site .foot-bar a:hover { color: var(--ink); text-decoration: underline; }
 
 @media (max-width: 760px) {
-  .cs-site .cs-top .wrap { padding-top: var(--space-3); padding-bottom: var(--space-3); gap: var(--space-3); }
-  .cs-site .cs-top nav { gap: var(--space-4); }
   .cs-site .cs-intro { padding: var(--space-12) 0 var(--space-8); }
   .cs-site h1 { font-size: 32px; }
   .cs-site .skill-head h1 { font-size: 26px; }

@@ -489,17 +489,23 @@ function readAsset(name) {
 const ICONS = {
     mark: () => readAsset('mark.svg').replace('<svg ', '<svg aria-hidden="true" focusable="false" '),
     wordmark: () => readAsset('wordmark.svg'),
+    icon: (name, cls) => readAsset(`${name}.svg`).replace('<svg ', `<svg class="${cls}" aria-hidden="true" focusable="false" `),
     theme: (name) => readAsset(`theme-${name}.svg`).replace('<svg ', `<svg class="i-${name}" aria-hidden="true" focusable="false" `),
 };
 
 const THEME_SCRIPT = `<script>
 (() => {
-  // Dark first. The choice is system, light or dark, kept in local storage when it can be.
+  // The same control as the main site (markpitt.github.io Base.astro): one origin, one
+  // \`theme\` key. Light and dark are stored; system is the key's absence. The cycle is
+  // system, light, dark, as there.
   const root = document.documentElement;
   const media = matchMedia('(prefers-color-scheme: light)');
   const order = ['system', 'light', 'dark'];
   let choice = 'system';
-  try { choice = localStorage.getItem('theme') || 'system'; } catch (e) {}
+  try {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') choice = stored;
+  } catch (e) {}
   const apply = () => {
     root.dataset.theme = choice === 'system' ? (media.matches ? 'light' : 'dark') : choice;
     const b = document.querySelector('[data-theme-toggle]');
@@ -515,12 +521,46 @@ const THEME_SCRIPT = `<script>
     apply();
     document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
       choice = order[(order.indexOf(choice) + 1) % order.length];
-      try { localStorage.setItem('theme', choice); } catch (e) {}
+      try {
+        if (choice === 'system') localStorage.removeItem('theme');
+        else localStorage.setItem('theme', choice);
+      } catch (e) {}
       apply();
     });
   });
 })();
 </script>`;
+
+/* Closes the collapsed site menu, as the main site's Nav.astro does: on a link, on Escape (focus
+ * back to the toggle), when focus leaves it and on a click outside it. */
+const MENU_SCRIPT = `<script>
+(() => {
+  const menu = document.querySelector('[data-nav-menu]');
+  if (!menu) return;
+  const close = () => menu.removeAttribute('open');
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+  menu.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !menu.open) return;
+    close();
+    menu.querySelector('summary')?.focus();
+  });
+  menu.addEventListener('focusout', (e) => {
+    if (menu.open && e.relatedTarget instanceof Node && !menu.contains(e.relatedTarget)) close();
+  });
+  document.addEventListener('click', (e) => {
+    if (menu.open && e.target instanceof Node && !menu.contains(e.target)) close();
+  });
+})();
+</script>`;
+
+/** The main site's own sections, in its nav's order. Skills is this site. */
+const SITE_NAV = [
+    ['about', 'About'],
+    ['expertise', 'Expertise'],
+    ['work', 'Work'],
+    ['experience', 'Experience'],
+    ['contact', 'Contact'],
+];
 
 /** The page frame every page shares. `depth` is how far below docs/ the page sits. */
 function layout({ title, description, depth = 0, current = '', body }) {
@@ -535,9 +575,7 @@ function layout({ title, description, depth = 0, current = '', body }) {
 <title>${esc(title)}</title>
 ${description ? `<meta name="description" content="${esc(description)}">` : ''}
 <link rel="icon" href="${up}favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${up}fonts.css">
 <link rel="stylesheet" href="${up}tokens.css">
 <link rel="stylesheet" href="${up}style.css">
 ${THEME_SCRIPT}
@@ -545,30 +583,41 @@ ${THEME_SCRIPT}
 <body class="cs-site">
 <a class="skip" href="#main">Skip to the content</a>
 <header class="cs-top">
-  <div class="wrap">
-    <span class="lockup">
-      <a class="brand" href="${SITE_HOME}">${ICONS.mark()}${ICONS.wordmark()}</a>
-      <span class="sep" aria-hidden="true">/</span>
-      <a class="product" href="${up}index.html">claude-skills</a>
-    </span>
-    <nav aria-label="Site">
-      ${navLink('index.html#groups', 'Groups', 'groups')}
-      ${navLink('index.html#skills', 'All skills', 'skills')}
-      ${navLink('getting-started.html', 'Install', 'install')}
-      <a href="${REPO_URL}">GitHub</a>
+  <div class="wrap-nav">
+    <a class="lockup" href="${SITE_HOME}/">${ICONS.mark()}${ICONS.wordmark()}</a>
+    <nav class="nav-right" aria-label="Site">
+      <details class="nav-menu" data-nav-menu>
+        <summary class="nav-menu-toggle" aria-label="Menu">${ICONS.icon('hamburger', 'i-open')}${ICONS.icon('nav-close', 'i-close')}</summary>
+        <ul class="nav-menu-links">
+          ${SITE_NAV.map(([id, label]) => `<li><a href="${SITE_HOME}/#${id}">${label}</a></li>`).join('\n          ')}
+          <li><a href="${up}index.html" aria-current="true">Skills</a></li>
+        </ul>
+      </details>
       <button type="button" class="theme-toggle" data-theme-toggle data-theme-state="system" aria-label="Theme: System. Press for Light.">${ICONS.theme('system')}${ICONS.theme('light')}${ICONS.theme('dark')}</button>
     </nav>
   </div>
 </header>
+<div class="cs-sub">
+  <div class="wrap">
+    <a class="product" href="${up}index.html">claude-skills</a>
+    <nav aria-label="claude-skills">
+      ${navLink('index.html#groups', 'Groups', 'groups')}
+      ${navLink('index.html#skills', 'All skills', 'skills')}
+      ${navLink('getting-started.html', 'Install', 'install')}
+      <a href="${REPO_URL}">GitHub</a>
+    </nav>
+  </div>
+</div>
 <main id="main">
 ${body}
 </main>
 <footer class="foot-bar">
   <div class="wrap">
-    <span>By Mark Pitt · <a href="${SITE_HOME}">markpitt.dev</a></span>
+    <a href="${SITE_HOME}/">Mark Pitt</a>
     <span>Apache-2.0 · <a href="${REPO_URL}">${REPO}</a></span>
   </div>
 </footer>
+${MENU_SCRIPT}
 </body>
 </html>
 `;
@@ -910,9 +959,10 @@ function build() {
     fs.writeFileSync(path.join(DOCS_DIR, 'getting-started.html'), generateGettingStartedPage(groups));
     console.log('✓ Generated getting-started.html');
 
-    for (const file of ['style.css', 'tokens.css']) fs.copyFileSync(path.join(SITE_SRC, file), path.join(DOCS_DIR, file));
+    for (const file of ['style.css', 'tokens.css', 'fonts.css']) fs.copyFileSync(path.join(SITE_SRC, file), path.join(DOCS_DIR, file));
+    fs.cpSync(path.join(SITE_SRC, 'fonts'), path.join(DOCS_DIR, 'fonts'), { recursive: true });
     fs.copyFileSync(path.join(SITE_SRC, 'assets', 'mark.svg'), path.join(DOCS_DIR, 'favicon.svg'));
-    console.log('✓ Copied style.css, tokens.css and favicon.svg');
+    console.log('✓ Copied style.css, tokens.css, fonts.css, fonts/ and favicon.svg');
 
     // Prevent GitHub Pages from running Jekyll on the static output
     fs.writeFileSync(path.join(DOCS_DIR, '.nojekyll'), '');
