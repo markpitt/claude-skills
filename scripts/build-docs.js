@@ -104,27 +104,150 @@ function parseFrontmatter(content) {
     return { metadata, content: lines.slice(endIndex + 1).join('\n') };
 }
 
-/** Inline markdown: code, links, bold and italic. Text is escaped first. */
-function inline(text, base = '') {
+/* Syntax highlighting.
+ *
+ * A small tokenizer rather than a dependency, so the build stays `node scripts/build-docs.js` with
+ * nothing to install. It knows comments, strings, numbers and keywords, which is all the brand's
+ * code mapping colours (personal-brand products.md, "Code and editors"): keywords in accent-text,
+ * strings in success, numbers in warning, comments in muted, everything else in ink. Every piece of
+ * text is escaped on the way out, so a file that holds HTML is shown and never run.
+ */
+const words = (s) => new Set(s.split(/\s+/).filter(Boolean));
+const C_COMMENTS = { line: ['//'], block: [['/*', '*/']] };
+const JS_WORDS = 'const let var function return if else for while do switch case default break continue new class extends import export from as async await try catch finally throw typeof instanceof in of this super null undefined true false void delete yield static get set';
+const LANGS = {
+    python: { line: ['#'], strings: ['"""', "'''", '"', "'"], keywords: words('False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield match case self') },
+    bash: { line: ['#'], hashAfterSpace: true, strings: ['"', "'"], multiline: ['"', "'"], rawSingle: true, keywords: words('if then else elif fi case esac for while until do done in function return local export readonly declare unset shift exit break continue source trap select') },
+    javascript: { ...C_COMMENTS, strings: ['"', "'", '`'], multiline: ['`'], keywords: words(JS_WORDS) },
+    typescript: { ...C_COMMENTS, strings: ['"', "'", '`'], multiline: ['`'], keywords: words(`${JS_WORDS} interface type enum implements private public protected readonly declare namespace abstract keyof satisfies is any unknown never string number boolean`) },
+    csharp: { ...C_COMMENTS, strings: ['"""', '"', "'"], keywords: words('abstract as async await base bool break byte case catch char class const continue decimal default delegate do double else enum event explicit extern false finally fixed float for foreach get goto if implicit in init int interface internal is lock long namespace new null object operator out override params private protected public readonly record ref required return sbyte sealed set short sizeof static string struct switch this throw true try typeof uint ulong unchecked unsafe ushort using var virtual void volatile when where while with yield') },
+    rust: { ...C_COMMENTS, strings: ['"'], multiline: ['"'], keywords: words('as async await break const continue crate dyn else enum extern false fn for if impl in let loop match mod move mut pub ref return self Self static struct super trait true type unsafe use where while') },
+    go: { ...C_COMMENTS, strings: ['"', '`', "'"], multiline: ['`'], keywords: words('break case chan const continue default defer else fallthrough for func go goto if import interface map package range return select struct switch type var nil true false') },
+    dart: { ...C_COMMENTS, strings: ['"""', "'''", '"', "'"], keywords: words('abstract as async await break case catch class const continue default do else enum extends false final finally for if implements import in is late library new null required return static super switch this throw true try var void while with yield') },
+    c: { ...C_COMMENTS, strings: ['"', "'"], keywords: words('auto break case char const continue default do double else enum extern float for goto if inline int long register return short signed sizeof static struct switch typedef union unsigned void volatile while bool true false NULL') },
+    json: { ...C_COMMENTS, strings: ['"'], keywords: words('true false null') },
+    yaml: { line: ['#'], hashAfterSpace: true, strings: ['"', "'"], quoteAfterBoundary: true, keywords: words('true false null yes no on off') },
+    toml: { line: ['#'], strings: ['"""', "'''", '"', "'"], keywords: words('true false') },
+    ini: { line: ['#', ';'], strings: [], keywords: words('') },
+    powershell: { line: ['#'], block: [['<#', '#>']], strings: ['"', "'"], multiline: ['"', "'"], ignoreCase: true, keywords: words('begin break catch class continue data do dynamicparam else elseif end enum exit filter finally for foreach from function if in param process return switch throw trap try until using while') },
+};
+const LANG_ALIASES = {
+    sh: 'bash', shell: 'bash', zsh: 'bash', console: 'bash', py: 'python', python3: 'python',
+    js: 'javascript', mjs: 'javascript', node: 'javascript', ts: 'typescript', tsx: 'typescript',
+    cs: 'csharp', 'c#': 'csharp', rs: 'rust', golang: 'go', yml: 'yaml', jsonc: 'json', json5: 'json',
+    ps1: 'powershell', pwsh: 'powershell', ps: 'powershell', cpp: 'c', 'c++': 'c', h: 'c',
+    conf: 'ini', systemd: 'ini',
+};
+const LANG_LABELS = {
+    python: 'Python', bash: 'Bash', javascript: 'JavaScript', typescript: 'TypeScript', csharp: 'C#',
+    rust: 'Rust', go: 'Go', dart: 'Dart', c: 'C', json: 'JSON', yaml: 'YAML', toml: 'TOML', ini: 'INI',
+    powershell: 'PowerShell', markdown: 'Markdown', text: 'Plain text',
+};
+const NUMBER = /0[xXbBoO][\da-fA-F_]+|\d[\d_]*(\.\d+)?([eE][+-]?\d+)?/y;
+const IDENT = /[A-Za-z_$@][\w$]*/y;
+
+function highlight(code, lang) {
+    const spec = LANGS[LANG_ALIASES[lang] || lang];
+    if (!spec) return esc(code);
+    const out = [];
+    let plain = '';
+    const flush = () => { if (plain) { out.push(esc(plain)); plain = ''; } };
+    // A token is wrapped line by line, so a span never crosses a line break.
+    const token = (cls, text) => {
+        flush();
+        out.push(text.split('\n').map(t => (t ? `<span class="tk-${cls}">${esc(t)}</span>` : '')).join('\n'));
+    };
+    const n = code.length;
+    let i = 0;
+    scan: while (i < n) {
+        const prev = i ? code[i - 1] : '\n';
+        for (const [open, close] of spec.block || []) {
+            if (code.startsWith(open, i)) {
+                const end = code.indexOf(close, i + open.length);
+                const stop = end < 0 ? n : end + close.length;
+                token('c', code.slice(i, stop)); i = stop; continue scan;
+            }
+        }
+        for (const marker of spec.line || []) {
+            if (code.startsWith(marker, i) && !(spec.hashAfterSpace && marker === '#' && !/\s/.test(prev))) {
+                const end = code.indexOf('\n', i);
+                const stop = end < 0 ? n : end;
+                token('c', code.slice(i, stop)); i = stop; continue scan;
+            }
+        }
+        for (const q of spec.strings) {
+            if (!code.startsWith(q, i) || (spec.quoteAfterBoundary && /\w/.test(prev))) continue;
+            let j = i + q.length;
+            const raw = spec.rawSingle && q === "'";
+            const multiline = q.length === 3 || (spec.multiline || []).includes(q);
+            while (j < n) {
+                if (code[j] === '\\' && !raw) { j += 2; continue; }
+                if (code.startsWith(q, j)) { j += q.length; break; }
+                if (code[j] === '\n' && !multiline) break;
+                j++;
+            }
+            token('s', code.slice(i, Math.min(j, n))); i = Math.min(j, n); continue scan;
+        }
+        if (/\d/.test(code[i]) && !/[\w$]/.test(prev)) {
+            NUMBER.lastIndex = i;
+            const m = NUMBER.exec(code);
+            if (m) { token('n', m[0]); i += m[0].length; continue; }
+        }
+        if (/[A-Za-z_$@]/.test(code[i]) && !/[\w$]/.test(prev)) {
+            IDENT.lastIndex = i;
+            const word = IDENT.exec(code)[0];
+            const key = spec.ignoreCase ? word.toLowerCase() : word;
+            // `obj.type` is a property, not the keyword.
+            if (prev !== '.' && spec.keywords.has(key)) token('k', word);
+            else plain += word;
+            i += word.length;
+            continue;
+        }
+        plain += code[i++];
+    }
+    flush();
+    return out.join('');
+}
+
+/**
+ * Inline markdown: code, links, bold and italic. Text is escaped first.
+ *
+ * `links` says where a relative link goes. It is either a base URL that relative links are joined
+ * to, or an object with `href(target)` (a URL, or null to drop the link and keep its text) and an
+ * optional `code(text)`, which turns a code span naming one of the skill's files into a link to it.
+ */
+function inline(text, links = '') {
+    const ctx = typeof links === 'string'
+        ? { href: (h) => (links ? `${links}/${h.replace(/^\.\//, '')}` : null) }
+        : links;
     const codes = [];
     let s = text.replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return `\u0000${codes.length - 1}\u0000`; });
     s = esc(s)
         .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, href) => {
-            // Links into the skill's own folder do not exist on this site; send them to GitHub.
+            // A code span inside a link label stays plain code, so links never nest.
+            label = label.replace(/\u0000(\d+)\u0000/g, '\u0001$1\u0001');
             const external = /^(https?:|mailto:|#)/.test(href);
             if (external) return `<a href="${href}">${label}</a>`;
-            return base ? `<a href="${base}/${href.replace(/^\.\//, '')}">${label}</a>` : label;
+            const target = ctx.href(href.replace(/&amp;/g, '&'));
+            return target ? `<a href="${esc(target)}">${label}</a>` : label;
         })
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/(^|[^\w*])\*([^*\s][^*]*?)\*(?!\w)/g, '$1<em>$2</em>');
-    return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
+    return s
+        .replace(/\u0001(\d+)\u0001/g, (_, i) => `<code>${esc(codes[+i])}</code>`)
+        .replace(/\u0000(\d+)\u0000/g, (_, i) => {
+            const url = ctx.code && ctx.code(codes[+i]);
+            return url ? `<a href="${esc(url)}"><code>${esc(codes[+i])}</code></a>` : `<code>${esc(codes[+i])}</code>`;
+        });
 }
 
 /**
- * Markdown to HTML for SKILL.md bodies: headings, paragraphs, lists, fenced code, tables and
- * block quotes. Code is escaped, so a skill that shows HTML cannot break the page.
+ * Markdown to HTML for SKILL.md bodies and the skill's own markdown files: headings, paragraphs,
+ * lists, fenced code, tables and block quotes. Code is escaped, so a skill that shows HTML cannot
+ * break the page. `links` is as for `inline`.
  */
-function markdownToHtml(markdown, base = '') {
+function markdownToHtml(markdown, links = '') {
+    const base = links;
     const lines = markdown.replace(/\r\n/g, '\n').split('\n');
     const out = [];
     let i = 0;
@@ -138,7 +261,8 @@ function markdownToHtml(markdown, base = '') {
             i++;
             while (i < lines.length && !/^```/.test(lines[i])) body.push(lines[i++]);
             i++;
-            out.push(`<pre><code${fence[1] ? ` class="language-${esc(fence[1])}"` : ''}>${esc(body.join('\n'))}</code></pre>`);
+            const lang = fence[1].toLowerCase();
+            out.push(`<pre><code${lang ? ` class="language-${esc(lang)}"` : ''}>${highlight(body.join('\n'), lang)}</code></pre>`);
             continue;
         }
         const heading = line.match(/^(#{1,6})\s+(.*)$/);
@@ -195,6 +319,143 @@ function firstSentence(text, max = 180) {
     return s;
 }
 
+/* Bundled files: everything in a skill's folder apart from SKILL.md, as its zip carries them.
+ * The exclusions match scripts/package_skills.py, so the site lists what a download holds. */
+const EXCLUDE_NAMES = new Set(['.DS_Store', 'Thumbs.db']);
+const EXCLUDE_DIRS = new Set(['__pycache__', '.git']);
+const EXT_LANG = {
+    md: 'markdown', markdown: 'markdown', py: 'python', sh: 'bash', bash: 'bash', zsh: 'bash',
+    js: 'javascript', mjs: 'javascript', cjs: 'javascript', ts: 'typescript', mts: 'typescript', tsx: 'typescript',
+    cs: 'csharp', csx: 'csharp', rs: 'rust', go: 'go', dart: 'dart', c: 'c', h: 'c', cpp: 'c',
+    json: 'json', jsonc: 'json', yml: 'yaml', yaml: 'yaml', toml: 'toml', ini: 'ini', service: 'ini',
+    timer: 'ini', ps1: 'powershell', psm1: 'powershell', txt: 'text',
+};
+
+/** The language a file is shown in: by extension, then by its #! line, else plain text. */
+function detectLanguage(rel, text) {
+    const name = path.posix.basename(rel).replace(/\.example$/, '');
+    const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+    if (EXT_LANG[ext]) return EXT_LANG[ext];
+    const shebang = (text.match(/^#!(.*)/) || [])[1] || '';
+    if (/\b(ba|z)?sh\b/.test(shebang)) return 'bash';
+    if (/python/.test(shebang)) return 'python';
+    if (/\bnode\b/.test(shebang)) return 'javascript';
+    if (/dotnet/.test(shebang)) return 'csharp';
+    if (/pwsh/.test(shebang)) return 'powershell';
+    return 'text';
+}
+
+function bundledFiles(skillDir) {
+    const files = [];
+    const walk = (dir) => {
+        for (const d of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+            const abs = path.join(dir, d.name);
+            if (d.isDirectory()) { if (!EXCLUDE_DIRS.has(d.name)) walk(abs); continue; }
+            if (!d.isFile() || EXCLUDE_NAMES.has(d.name) || d.name.endsWith('.pyc')) continue;
+            const rel = path.relative(skillDir, abs).split(path.sep).join('/');
+            if (rel === 'SKILL.md') continue;
+            const bytes = fs.readFileSync(abs);
+            const binary = bytes.subarray(0, 8000).includes(0);
+            const text = binary ? '' : bytes.toString('utf8').replace(/\r\n/g, '\n');
+            files.push({
+                rel,
+                size: bytes.length,
+                binary,
+                text,
+                lang: binary ? 'binary' : detectLanguage(rel, text),
+                lines: binary ? 0 : text.replace(/\n$/, '').split('\n').length,
+            });
+        }
+    };
+    walk(skillDir);
+    return files;
+}
+
+const fileSize = (n) => (n < 1024 ? `${n} B` : `${(n / 1024).toFixed(n < 10240 ? 1 : 0)} KB`);
+
+/** Where a skill's page, or one of its files' pages, sits below docs/skills/. */
+const pagePath = (skill, rel) => (rel === 'SKILL.md' ? `${skill.path}.html` : `${skill.path}/${rel}.html`);
+
+/** A link from the page in `fromDir` (relative to docs/skills/) to `target` (likewise). */
+const relLink = (fromDir, target) => encodeURI(path.posix.relative(`/${fromDir}`, `/${target}`));
+
+/** The skill's folder in its repository on GitHub, to `blob` or `tree` level. */
+function githubUrl(skill, rel = '', kind = 'tree') {
+    const repo = skill.group ? skill.group.repoUrl : REPO_URL;
+    return `${repo}/${kind}/main/skills/${skill.path}${rel ? `/${rel}` : ''}`;
+}
+
+/**
+ * How links behave in markdown shown on the page for `fromRel` (SKILL.md or a bundled file).
+ * A link to one of the skill's files opens its page here; a link to a sibling skill's SKILL.md
+ * opens that skill's page; anything else in the repository goes to GitHub.
+ */
+function linkContext(skill, fromRel, skills) {
+    const byRel = new Map(skill.files.map(f => [f.rel, f]));
+    const here = path.posix.dirname(fromRel) === '.' ? '' : path.posix.dirname(fromRel);
+    const fromDir = fromRel === 'SKILL.md' ? '' : path.posix.join(skill.path, here);
+    const locate = (target) => {
+        if (target === 'SKILL.md') return pagePath(skill, 'SKILL.md');
+        if (byRel.has(target) && !byRel.get(target).binary) return pagePath(skill, target);
+        const sibling = target.match(/^\.\.\/([^/]+)\/SKILL\.md$/);
+        const other = sibling && skills.find(s => s.path === sibling[1] && s.group === skill.group);
+        return other ? pagePath(other, 'SKILL.md') : null;
+    };
+    return {
+        href(href) {
+            const [rawPath, fragment] = href.split('#');
+            let decoded = rawPath;
+            try { decoded = decodeURI(rawPath); } catch (e) { /* keep it as written */ }
+            const target = path.posix.normalize(path.posix.join(here, decoded)).replace(/\/$/, '');
+            const local = locate(target);
+            if (local) {
+                const link = relLink(fromDir, local);
+                return fragment ? `${link}#${fragment}` : link;
+            }
+            // Outside this site: the same path in the group repository, if it stays inside it.
+            const inRepo = path.posix.normalize(`skills/${skill.path}/${target}`);
+            if (inRepo.startsWith('..')) return null;
+            const repo = skill.group ? skill.group.repoUrl : REPO_URL;
+            const url = `${repo}/${/\.\w+$/.test(inRepo) ? 'blob' : 'tree'}/main/${inRepo}`;
+            return fragment ? `${url}#${fragment}` : url;
+        },
+        code(text) {
+            const t = text.trim();
+            if (!/\//.test(t) && !/\.\w+$/.test(t)) return null;
+            for (const target of [t.replace(/^\.\//, ''), path.posix.normalize(path.posix.join(here, t))]) {
+                if (target !== fromRel && byRel.has(target) && !byRel.get(target).binary) {
+                    return relLink(fromDir, pagePath(skill, target));
+                }
+            }
+            return null;
+        },
+    };
+}
+
+/** The skill's files as a tree: SKILL.md, the other top-level files, then each folder. */
+function fileTree(skill, currentRel) {
+    const fromDir = currentRel === 'SKILL.md' ? '' : path.posix.join(skill.path, path.posix.dirname(currentRel));
+    const item = (rel, label, size, binary) => {
+        const link = binary
+            ? `<a href="${esc(githubUrl(skill, rel, 'blob'))}">${esc(label)}</a>`
+            : rel === currentRel
+                ? `<a aria-current="page" href="${esc(relLink(fromDir, pagePath(skill, rel)))}">${esc(label)}</a>`
+                : `<a href="${esc(relLink(fromDir, pagePath(skill, rel)))}">${esc(label)}</a>`;
+        return `<li>${link}<span class="size num">${fileSize(size)}</span></li>`;
+    };
+    const top = [item('SKILL.md', 'SKILL.md', skill.skillMdSize, false)];
+    const folders = new Map();
+    for (const f of skill.files) {
+        const dir = path.posix.dirname(f.rel);
+        if (dir === '.') { top.push(item(f.rel, f.rel, f.size, f.binary)); continue; }
+        if (!folders.has(dir)) folders.set(dir, []);
+        folders.get(dir).push(item(f.rel, path.posix.basename(f.rel), f.size, f.binary));
+    }
+    const dirs = [...folders.keys()].sort().map(dir =>
+        `<li class="dir"><span class="dir-name">${esc(dir)}/</span><ul>${folders.get(dir).join('')}</ul></li>`);
+    return `<ul class="files">${top.join('')}${dirs.join('')}</ul>`;
+}
+
 function discoverSkills(groups) {
     const skills = [];
     for (const { root, group } of skillsRoots(groups)) {
@@ -213,6 +474,8 @@ function discoverSkills(groups) {
                 path: d.name,
                 group,
                 content,
+                skillMdSize: fs.statSync(skillMdPath).size,
+                files: bundledFiles(path.join(root, d.name)),
             });
         }
     }
@@ -446,6 +709,7 @@ function generateSkillPage(skill, skills) {
       <div class="meta">
         ${skill.version ? `<span class="chip num">Version ${esc(skill.version)}</span>` : ''}
         ${g ? `<span class="chip">${esc(g.title)}</span>` : ''}
+        <a class="chip" href="#files-title">${plural(skill.files.length + 1, 'file')}</a>
       </div>
       <div class="actions">
         <a class="btn primary download" href="${esc(zip)}" download>Download ${esc(skill.path)}.zip</a>
@@ -456,10 +720,15 @@ function generateSkillPage(skill, skills) {
       <article>
         <div class="doc-label"><span class="label">SKILL.md</span><span class="muted small">What Claude reads when the skill is used</span></div>
         <div class="prose">
-${markdownToHtml(skill.content, source.replace('/tree/', '/blob/'))}
+${markdownToHtml(skill.content, linkContext(skill, 'SKILL.md', skills))}
         </div>
       </article>
       <aside>
+        <section aria-labelledby="files-title">
+          <h2 id="files-title">Files</h2>
+          ${fileTree(skill, 'SKILL.md')}
+          <p>Everything in the zip. Each file opens here, so you can read the whole skill before you install it.</p>
+        </section>
         <section aria-labelledby="install-title">
           <h2 id="install-title">Install</h2>
 <pre><code>curl -LO ${esc(zip)}
@@ -483,6 +752,83 @@ unzip ${esc(skill.path)}.zip -d ~/.claude/skills/</code></pre>
         title: `${skill.name} · claude-skills`,
         description: firstSentence(skill.description, 155),
         depth: 1,
+        body,
+    });
+}
+
+/** A code file with line numbers. The numbers are a separate column screen readers skip. */
+function codeView(file) {
+    const text = file.text.replace(/\n$/, '');
+    const numbers = Array.from({ length: file.lines }, (_, i) => i + 1).join('\n');
+    return `<div class="code-view">
+<pre class="gutter" aria-hidden="true">${numbers}</pre>
+<pre class="code" tabindex="0" aria-label="${esc(file.rel)}, ${plural(file.lines, 'line')}"><code class="language-${esc(file.lang)}">${highlight(text, file.lang)}</code></pre>
+</div>`;
+}
+
+/** The page for one of a skill's bundled files: markdown rendered, anything else highlighted. */
+function generateFilePage(skill, file, skills) {
+    const g = skill.group;
+    const dir = path.posix.dirname(file.rel);
+    const fromDir = path.posix.join(skill.path, dir === '.' ? '' : dir);
+    const depth = 1 + fromDir.split('/').length;
+    const up = '../'.repeat(depth);
+    const zip = `${DOWNLOAD_BASE}/${skill.path}.zip`;
+    const label = LANG_LABELS[file.lang] || file.lang;
+
+    let content;
+    let note;
+    if (file.lang === 'markdown') {
+        const { metadata, content: body } = parseFrontmatter(file.text);
+        const front = body === file.text ? '' : file.text.slice(0, file.text.length - body.length).replace(/\n+$/, '');
+        content = `${front ? `<pre><code class="language-yaml">${highlight(front, 'yaml')}</code></pre>\n` : ''}<div class="prose">
+${markdownToHtml(body, linkContext(skill, file.rel, skills))}
+</div>`;
+        note = metadata && front ? 'Markdown, rendered, with its frontmatter' : 'Markdown, rendered';
+    } else {
+        content = codeView(file);
+        note = `${label}, shown as text and never run`;
+    }
+
+    const body = `
+  <div class="wrap">
+    <ol class="crumbs">
+      <li><a href="${up}index.html">claude-skills</a></li>
+      ${g ? `<li><a href="${up}index.html#${esc(g.id)}">${esc(g.title)}</a></li>` : ''}
+      <li><a href="${esc(relLink(fromDir, pagePath(skill, 'SKILL.md')))}">${esc(skill.path)}</a></li>
+      <li aria-current="page">${esc(file.rel)}</li>
+    </ol>
+    <header class="skill-head file-head">
+      <p class="file-of small muted">A file in <a href="${esc(relLink(fromDir, pagePath(skill, 'SKILL.md')))}">${esc(skill.path)}</a></p>
+      <h1>${esc(file.rel)}</h1>
+      <div class="meta">
+        <span class="chip">${esc(label)}</span>
+        ${file.lang === 'markdown' ? '' : `<span class="chip num">${plural(file.lines, 'line')}</span>`}
+        <span class="chip num">${fileSize(file.size)}</span>
+      </div>
+      <div class="actions">
+        <a class="btn primary download" href="${esc(zip)}" download>Download ${esc(skill.path)}.zip</a>
+        <a class="btn" href="${esc(githubUrl(skill, file.rel, 'blob'))}">View on GitHub</a>
+      </div>
+    </header>
+    <div class="skill-body">
+      <article>
+        <div class="doc-label"><span class="label">${esc(path.posix.basename(file.rel))}</span><span class="muted small">${esc(note)}</span></div>
+        ${content}
+      </article>
+      <aside>
+        <section aria-labelledby="files-title">
+          <h2 id="files-title">Files in ${esc(skill.path)}</h2>
+          ${fileTree(skill, file.rel)}
+        </section>
+      </aside>
+    </div>
+  </div>`;
+
+    return layout({
+        title: `${file.rel} · ${skill.path} · claude-skills`,
+        description: `${file.rel}, a file in the ${skill.path} skill.`,
+        depth,
         body,
     });
 }
@@ -540,6 +886,8 @@ function build() {
     console.log(`Found ${skills.length} skills in ${new Set(skills.map(s => s.group?.id)).size} groups\n`);
 
     const skillsDocsDir = path.join(DOCS_DIR, 'skills');
+    // Start skills/ clean, so a file removed from a skill does not leave its page behind.
+    fs.rmSync(skillsDocsDir, { recursive: true, force: true });
     fs.mkdirSync(skillsDocsDir, { recursive: true });
 
     fs.writeFileSync(path.join(DOCS_DIR, 'index.html'), generateIndexPage(skills, groups));
@@ -548,6 +896,17 @@ function build() {
         fs.writeFileSync(path.join(skillsDocsDir, `${skill.path}.html`), generateSkillPage(skill, skills));
     }
     console.log(`✓ Generated ${skills.length} pages in skills/`);
+    let filePages = 0;
+    for (const skill of skills) {
+        for (const file of skill.files) {
+            if (file.binary) continue;
+            const out = path.join(skillsDocsDir, ...pagePath(skill, file.rel).split('/'));
+            fs.mkdirSync(path.dirname(out), { recursive: true });
+            fs.writeFileSync(out, generateFilePage(skill, file, skills));
+            filePages++;
+        }
+    }
+    console.log(`✓ Generated ${filePages} pages for the skills' bundled files`);
     fs.writeFileSync(path.join(DOCS_DIR, 'getting-started.html'), generateGettingStartedPage(groups));
     console.log('✓ Generated getting-started.html');
 
@@ -563,4 +922,4 @@ function build() {
 
 if (require.main === module) build();
 
-module.exports = { markdownToHtml, parseFrontmatter, firstSentence };
+module.exports = { markdownToHtml, parseFrontmatter, firstSentence, highlight, detectLanguage };
