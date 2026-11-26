@@ -140,6 +140,31 @@
 .cs-site .prose th { font: var(--type-ui-label); color: var(--muted); }
 .cs-site .doc-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-3); margin-bottom: var(--space-6); border-bottom: 1px solid var(--border-subtle); }
 
+/* Syntax highlighting, from the brand's code mapping (personal-brand products.md, "Code and
+ * editors"): keywords in accent-text, strings in success, numbers in warning, comments in muted. */
+.cs-site .tk-k { color: var(--accent-text); }
+.cs-site .tk-s { color: var(--success); }
+.cs-site .tk-n { color: var(--warning); }
+.cs-site .tk-c { color: var(--muted); font-style: italic; }
+
+/* A skill's files: the tree in the side column, and a page per file. */
+.cs-site .files, .cs-site .files ul { padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-1); }
+.cs-site .files li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.cs-site .files li.dir { display: block; margin-top: var(--space-2); }
+.cs-site .files ul { margin-top: var(--space-1); padding-left: var(--space-3); border-left: 1px solid var(--border-subtle); }
+.cs-site .files a, .cs-site .files .dir-name { font-family: var(--font-mono); font-size: 13px; overflow-wrap: anywhere; min-width: 0; }
+.cs-site .files .dir-name { color: var(--muted); }
+.cs-site .files [aria-current] { color: var(--ink); font-weight: 700; text-decoration: none; }
+.cs-site .files .size { font: var(--type-small); color: var(--muted); white-space: nowrap; }
+.cs-site .file-head .file-of { margin-bottom: var(--space-2); }
+.cs-site .file-head .file-of a { color: var(--muted); }
+.cs-site .file-head h1 { font-size: 28px; }
+.cs-site .code-view { display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--surface-pill); border-radius: var(--radius-md); }
+.cs-site .code-view pre { font: var(--type-code); font-size: 14px; background: none; border-radius: 0; white-space: pre; }
+.cs-site .code-view .gutter { color: var(--muted); text-align: right; user-select: none; padding-right: var(--space-3); border-right: 1px solid var(--border-subtle); }
+.cs-site .code-view .code { overflow-x: auto; }
+.cs-site .code-view .code:focus-visible { outline-offset: -2px; }
+
 /* Footer */
 .cs-site .foot-bar { border-top: 1px solid var(--border-subtle); padding: var(--space-8) 0; font: var(--type-small); color: var(--muted); }
 .cs-site .foot-bar .wrap { display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
@@ -150,7 +175,9 @@
   .cs-site .cs-intro { padding: var(--space-12) 0 var(--space-8); }
   .cs-site h1 { font-size: 32px; }
   .cs-site .skill-head h1 { font-size: 26px; }
+  .cs-site .file-head h1 { font-size: 22px; }
+  .cs-site .code-view pre { font-size: 13px; }
   .cs-site .skill-list li { grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); }
   .cs-site .skill-list .desc { grid-column: 1 / -1; grid-row: 2; }
-  .cs-site .skill-body { grid-template-columns: 1fr; gap: var(--space-8); }
+  .cs-site .skill-body { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
 }
