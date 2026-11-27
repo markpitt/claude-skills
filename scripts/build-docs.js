@@ -647,7 +647,12 @@ const FILTER_SCRIPT = `<script>
     const q = input.value.trim().toLowerCase();
     let shown = 0;
     for (const r of rows) { const hit = !q || r.dataset.filter.includes(q); r.hidden = !hit; if (hit) shown++; }
-    document.querySelectorAll('[data-filter-group]').forEach((g) => { g.hidden = !g.querySelector('[data-filter]:not([hidden])'); });
+    // Each group shows only its matching skills, keeps its count in step, and hides when none match.
+    document.querySelectorAll('[data-filter-group]').forEach((g) => {
+      const hits = g.querySelectorAll('[data-filter]:not([hidden])').length;
+      g.hidden = hits === 0;
+      g.querySelector('[data-filter-count]').textContent = hits;
+    });
     count.textContent = q ? shown + ' of ' + total + ' skills' : '';
     empty.hidden = shown > 0;
     empty.querySelector('q').textContent = input.value.trim();
@@ -673,7 +678,7 @@ function generateIndexPage(skills, groups) {
     const catalogue = byGroup.filter(b => b.skills.length).map(({ group: g, skills: list }) => `
       <section class="catalogue-group" id="${esc(g.id)}" data-filter-group>
         <header>
-          <h3>${esc(g.title)} <span class="muted small num">${list.length}</span></h3>
+          <h3>${esc(g.title)} <span class="muted small num" data-filter-count>${list.length}</span></h3>
           <a class="repo" href="${esc(g.repoUrl)}">${esc(g.public_repo)}</a>
         </header>
         <ul class="skill-list">
@@ -683,7 +688,7 @@ function generateIndexPage(skills, groups) {
 
     const looseSection = loose.length ? `
       <section class="catalogue-group" id="ungrouped" data-filter-group>
-        <header><h3>Skills <span class="muted small num">${loose.length}</span></h3></header>
+        <header><h3>Skills <span class="muted small num" data-filter-count>${loose.length}</span></h3></header>
         <ul class="skill-list">
           ${loose.map(skillRow).join('\n          ')}
         </ul>
