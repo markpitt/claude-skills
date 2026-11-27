@@ -24,6 +24,9 @@
   -webkit-font-smoothing: antialiased;
 }
 .cs-site *, .cs-site *::before, .cs-site *::after { box-sizing: border-box; }
+/* The filter hides rows and groups with the hidden attribute. Rules such as .skill-list li's
+ * display: grid outrank the browser's own [hidden] rule, so restate it here and make it win. */
+.cs-site [hidden] { display: none !important; }
 .cs-site h1, .cs-site h2, .cs-site h3, .cs-site p, .cs-site ul, .cs-site ol, .cs-site pre, .cs-site figure { margin: 0; }
 
 .cs-site a { color: var(--accent-text); text-underline-offset: 3px; }
