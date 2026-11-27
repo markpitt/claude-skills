@@ -63,9 +63,10 @@
 .cs-site .theme-toggle[data-theme-state="system"] .i-system,
 .cs-site .theme-toggle[data-theme-state="light"] .i-light,
 .cs-site .theme-toggle[data-theme-state="dark"] .i-dark { display: block; }
-/* The main site's collapse width, 647px (its global.css and hamburger-nav.spec.ts): the links show
- * in one row from here up, behind the menu button below it. Move the two together. */
-@media (min-width: 647px) {
+/* The main site's collapse width, 724px since Projects joined the nav on 27/11/2026 (the shared
+ * chrome kit's chrome.css and the site's hamburger-nav.spec.ts): the links show in one row from
+ * here up, behind the menu button below it. Move them together. */
+@media (min-width: 724px) {
   .cs-site .nav-menu-toggle { display: none; }
   .cs-site .nav-menu-links { display: flex !important; position: static; }
   .cs-site .nav-menu::details-content { content-visibility: visible; }

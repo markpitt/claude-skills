@@ -553,7 +553,8 @@ const MENU_SCRIPT = `<script>
 })();
 </script>`;
 
-/** The main site's own sections, in its nav's order. Skills is this site. */
+/** The main site's own sections, in its nav's order. Skills is this site; Projects follows it
+ * (27/11/2026, added by hand until this site moves onto the shared chrome kit). */
 const SITE_NAV = [
     ['about', 'About'],
     ['expertise', 'Expertise'],
@@ -591,6 +592,7 @@ ${THEME_SCRIPT}
         <ul class="nav-menu-links">
           ${SITE_NAV.map(([id, label]) => `<li><a href="${SITE_HOME}/#${id}">${label}</a></li>`).join('\n          ')}
           <li><a href="${up}index.html" aria-current="true">Skills</a></li>
+          <li><a href="${SITE_HOME}/projects/">Projects</a></li>
         </ul>
       </details>
       <button type="button" class="theme-toggle" data-theme-toggle data-theme-state="system" aria-label="Theme: System. Press for Light.">${ICONS.theme('system')}${ICONS.theme('light')}${ICONS.theme('dark')}</button>
