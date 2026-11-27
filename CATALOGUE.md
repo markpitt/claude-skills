@@ -43,12 +43,12 @@ SKILL.md with no resources at all.
 
 | Skill | Bundled files | What it does |
 |---|---|---|
-| [avalonia](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/avalonia/SKILL.md) | 6 files | Expert guidance for developing cross-platform desktop applications with Avalonia UI framework. |
-| [azure-devops](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/azure-devops/SKILL.md) | 7 files | Works with the Azure DevOps REST API across all services including Boards (work items, queries, backlogs)… |
-| [azure-swa](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/azure-swa/SKILL.md) | 6 files | Expert guidance for Azure Static Web Apps including architecture, configuration, API integration with Azure… |
-| [blazor-blog-feature](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/blazor-blog-feature/SKILL.md) | 5 files | Adds a complete blog feature to an existing Blazor WebAssembly Static Web App with Azure Functions backend… |
-| [blazor-expert](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/blazor-expert/SKILL.md) | 6 files | Blazor development expertise covering Blazor Server, WebAssembly, and Hybrid apps. |
-| [dotnet-aspire](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/dotnet-aspire/SKILL.md) | 6 files | Adds .NET Aspire cloud-native orchestration to existing .NET solutions. |
+| [avalonia](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/avalonia/SKILL.md) | 6 files | Guides cross-platform .NET UI work with Avalonia, covering MVVM and data binding, XAML layout and controls… |
+| [azure-devops](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/azure-devops/SKILL.md) | 7 files | Works with the Azure DevOps REST API and the az devops CLI across Boards (work items, WIQL queries, sprints)… |
+| [azure-swa](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/azure-swa/SKILL.md) | 6 files | Builds, configures, deploys and troubleshoots Azure Static Web Apps, covering staticwebapp.config.json… |
+| [blazor-blog-feature](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/blazor-blog-feature/SKILL.md) | 5 files | Adds a markdown blog to an existing Blazor WebAssembly app hosted on Azure Static Web Apps, with an Azure… |
+| [blazor-expert](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/blazor-expert/SKILL.md) | 6 files | Guides Blazor development across Blazor Web Apps and their render modes (static SSR, Interactive Server… |
+| [dotnet-aspire](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/dotnet-aspire/SKILL.md) | 6 files | Adds Aspire (formerly .NET Aspire) orchestration to an existing .NET solution or starts a new one. |
 | [dotnet-github-packages-release](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/dotnet-github-packages-release/SKILL.md) | 7 files | Publishes .NET NuGet packages to a GitHub Packages organisation feed, lets the organisation's other… |
 | [dotnet-guru](https://github.com/markpitt/claude-skills-dotnet/blob/main/skills/dotnet-guru/SKILL.md) | 9 files | Enforces current C# and .NET 10 best practices when writing, reviewing, or refactoring .NET code. |
 
@@ -58,12 +58,12 @@ SKILL.md with no resources at all.
 
 | Skill | Bundled files | What it does |
 |---|---|---|
-| [golang-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/golang-guru/SKILL.md) | 6 files | Enforces Go 1.26 best practices when writing, reviewing, or refactoring Go code. |
-| [pwsh-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/pwsh-guru/SKILL.md) | 6 files | Enforces PowerShell 7.5+ best practices when writing, reviewing, or refactoring PowerShell scripts and… |
+| [golang-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/golang-guru/SKILL.md) | 6 files | Enforces Go 1.27 best practices when writing, reviewing, or refactoring Go code. |
+| [pwsh-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/pwsh-guru/SKILL.md) | 6 files | Enforces PowerShell 7.6 best practices when writing, reviewing, or refactoring PowerShell scripts and modules. |
 | [python-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/python-guru/SKILL.md) | 6 files | Enforces Python 3.12+ best practices when writing, reviewing, or refactoring Python code. |
 | [rust-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/rust-guru/SKILL.md) | 8 files | Enforces current Rust best practices when writing, reviewing, or refactoring Rust code. |
 | [shell-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/shell-guru/SKILL.md) | 5 files | Enforces current shell scripting best practices when writing, reviewing, or refactoring Bash/POSIX sh scripts. |
-| [typescript-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/typescript-guru/SKILL.md) | 6 files | Enforces TypeScript 5.9 best practices when writing, reviewing, or refactoring TypeScript code. |
+| [typescript-guru](https://github.com/markpitt/claude-skills-language-gurus/blob/main/skills/typescript-guru/SKILL.md) | 6 files | Enforces TypeScript 7 best practices when writing, reviewing, or refactoring TypeScript code. |
 
 ### [Engineering practices](https://github.com/markpitt/claude-skills-engineering-practices#readme)
 
@@ -72,12 +72,12 @@ SKILL.md with no resources at all.
 | Skill | Bundled files | What it does |
 |---|---|---|
 | [audit-remediation-loop](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/audit-remediation-loop/SKILL.md) | 4 files | Runs the full audit, remediation and review loop. |
-| [gof-design-patterns](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/gof-design-patterns/SKILL.md) | 6 files | Orchestrates Gang of Four design pattern implementations across 8 languages. |
+| [gof-design-patterns](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/gof-design-patterns/SKILL.md) | 6 files | Chooses and implements the 23 Gang of Four design patterns (creational, structural and behavioural) in C#… |
 | [grill-me](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/grill-me/SKILL.md) | none | Interview the user one decision at a time down a dependency-ordered decision tree, asking exactly one… |
-| [kiss-principle](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/kiss-principle/SKILL.md) | 3 files | Apply the KISS principle to reduce unnecessary complexity. |
-| [root-cause-analysis](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/root-cause-analysis/SKILL.md) | 4 files | Structured root cause analysis using named methodologies: Toyota's 5 Whys, Ishikawa fishbone, Pareto analysis… |
+| [kiss-principle](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/kiss-principle/SKILL.md) | 3 files | Reviews code or a design for complexity it does not need, and says what to remove, what to keep and why. |
+| [root-cause-analysis](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/root-cause-analysis/SKILL.md) | 4 files | Structured root cause analysis using named methods: Toyota's 5 Whys, Ishikawa fishbone, Pareto analysis… |
 | [tdd-guru](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/tdd-guru/SKILL.md) | 3 files | Enforces current Test-Driven Development (TDD) best practices across programming languages and scripts… |
-| [twelve-factor-app](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/twelve-factor-app/SKILL.md) | 7 files | Applies the Twelve-Factor App methodology when designing, building, reviewing, or auditing cloud-native and… |
+| [twelve-factor-app](https://github.com/markpitt/claude-skills-engineering-practices/blob/main/skills/twelve-factor-app/SKILL.md) | 7 files | Applies the Twelve-Factor App methodology when designing, building, reviewing or auditing cloud-native and… |
 
 ### [API skills](https://github.com/markpitt/claude-skills-api#readme)
 
@@ -85,12 +85,12 @@ SKILL.md with no resources at all.
 
 | Skill | Bundled files | What it does |
 |---|---|---|
-| [adguard-home-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/adguard-home-api/SKILL.md) | none | Query and manage an AdGuard Home DNS server through its REST API. Covers stats, the query log, finding out… |
-| [dokploy-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/dokploy-api/SKILL.md) | none | Inspect and operate Docker Compose stacks managed by a Dokploy instance through its HTTP API. Covers listing… |
-| [freeagent-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/freeagent-api/SKILL.md) | 7 files | Interacts with the FreeAgent accounting API to manage invoices, contacts, projects, expenses, timeslips, and… |
-| [github-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/github-api/SKILL.md) | 7 files | Orchestrates GitHub API access across all services. |
-| [home-assistant-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/home-assistant-api/SKILL.md) | 7 files | Orchestrates access to the Home Assistant REST API for programmatic control of smart home devices. |
-| [microsoft-graph-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/microsoft-graph-api/SKILL.md) | 8 files | Orchestration hub for Microsoft Graph API across Microsoft 365 services. |
+| [adguard-home-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/adguard-home-api/SKILL.md) | none | Queries and manages an AdGuard Home DNS server through its REST API. Covers stats, the query log, finding out… |
+| [dokploy-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/dokploy-api/SKILL.md) | none | Inspects and operates Docker Compose stacks managed by a Dokploy instance through its HTTP API. Covers… |
+| [freeagent-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/freeagent-api/SKILL.md) | 7 files | Calls the FreeAgent accounting API for invoices, estimates and credit notes, contacts, projects, timeslips… |
+| [github-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/github-api/SKILL.md) | 7 files | Calls the GitHub REST and GraphQL APIs, directly or through gh api, for repositories, branches and releases… |
+| [home-assistant-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/home-assistant-api/SKILL.md) | 7 files | Calls the Home Assistant REST and WebSocket APIs from code or scripts, for reading entity states and history… |
+| [microsoft-graph-api](https://github.com/markpitt/claude-skills-api/blob/main/skills/microsoft-graph-api/SKILL.md) | 8 files | Calls Microsoft Graph, the REST API for Microsoft 365 and Microsoft Entra ID (formerly Azure AD), for users… |
 
 ### [AI engineering](https://github.com/markpitt/claude-skills-ai-engineering#readme)
 
@@ -100,24 +100,24 @@ SKILL.md with no resources at all.
 |---|---|---|
 | [agent-council](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/agent-council/SKILL.md) | 4 files | Convenes a council of independent expert agents, each blind to the others and fixed to one lens, to review a… |
 | [agent-instruction-load-audit](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/agent-instruction-load-audit/SKILL.md) | 2 files | Proves at runtime which instruction files a coding-agent harness actually loaded, in what precedence, and… |
-| [agent-patterns](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/agent-patterns/SKILL.md) | 8 files | Modular orchestration of agent patterns from Anthropic's engineering guide. |
-| [ai-coding-agent-setup](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/ai-coding-agent-setup/SKILL.md) | 4 files | Configures AI agents (GitHub Copilot, Claude Code, Cursor, Codex) to understand a codebase and self-improve… |
-| [browser-assisted-portal](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/browser-assisted-portal/SKILL.md) | 1 file | Help a person through a government or service portal in a browser-automation session (for example Claude in… |
+| [agent-patterns](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/agent-patterns/SKILL.md) | 8 files | Chooses and implements the LLM workflow and agent patterns from Anthropic's "Building Effective Agents" guide… |
+| [ai-coding-agent-setup](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/ai-coding-agent-setup/SKILL.md) | 4 files | Sets a repository up so AI coding agents (GitHub Copilot, Claude Code, Cursor, Codex) understand it and keep… |
+| [browser-assisted-portal](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/browser-assisted-portal/SKILL.md) | 1 file | Helps a person through a government or service portal in a browser-automation session (for example Claude in… |
 | [decision-models](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/decision-models/SKILL.md) | 3 files | Uses a System One decision model (OpenRouter, inception/mercury-decide:free) through the bundled `decide`… |
-| [fine-tuning-data-generator](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/fine-tuning-data-generator/SKILL.md) | 6 files | Generates synthetic fine-tuning datasets in ChatML format (JSONL) for use with Unsloth, Axolotl, and similar… |
-| [genaiscript](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/genaiscript/SKILL.md) | 5 files | Expert guidance for Microsoft's GenAIScript framework - a JavaScript/TypeScript-based system for building… |
+| [fine-tuning-data-generator](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/fine-tuning-data-generator/SKILL.md) | 6 files | Plans, generates and validates synthetic fine-tuning datasets as ChatML JSONL for Unsloth, Axolotl, Hugging… |
+| [genaiscript](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/genaiscript/SKILL.md) | 5 files | Writes, debugs and hardens scripts for Microsoft's GenAIScript, the JavaScript and TypeScript framework for… |
 | [instruction-context-budget](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/instruction-context-budget/SKILL.md) | 2 files | Measures what a coding-agent harness always loads (CLAUDE.md and AGENTS.md chains, unscoped rules, memory… |
-| [local-llm-serving](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/local-llm-serving/SKILL.md) | 7 files | Serve local GGUF models on a single consumer GPU (for example 24 GB) through llama-swap, optionally fronted… |
+| [local-llm-serving](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/local-llm-serving/SKILL.md) | 7 files | Serves local GGUF models on a single consumer GPU (for example 24 GB) through llama-swap, optionally fronted… |
 | [omp-harness](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/omp-harness/SKILL.md) | 7 files | Configures and operates the omp coding agent harness, covering global and project config layers, model roles… |
 | [parallel-worktree-integration](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/parallel-worktree-integration/SKILL.md) | 3 files | Runs several subagents in parallel git worktrees, one branch per task pinned to a base commit, then… |
 | [pi-agent-extensions](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/pi-agent-extensions/SKILL.md) | 5 files | Writes, debugs and checks extensions for the pi coding agent, covering its ExtensionAPI events and tools… |
 | [project-kickoff](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/project-kickoff/SKILL.md) | none | Turns a rough idea for a new product, venture or project into a short goal statement and a set of parallel… |
-| [remediation-script](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/remediation-script/SKILL.md) | 2 files | Write a bash script for the human to run when a guard, sandbox or permission rule blocks the agent's own… |
-| [resume-after-crash](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/resume-after-crash/SKILL.md) | 3 files | Recover an agent's work after a host crash, WSL restart, Windows update reboot or lost terminal. |
-| [sandboxed-agent](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/sandboxed-agent/SKILL.md) | 4 files | Create a sandboxed coding agent for one folder, using a bubblewrap sandbox profile inferred from the folder… |
-| [thought-patterns](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/thought-patterns/SKILL.md) | 7 files | Orchestrates cognitive thinking patterns for complex problem-solving. |
+| [remediation-script](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/remediation-script/SKILL.md) | 2 files | Writes a bash script for the human to run when a guard, sandbox or permission rule blocks the agent's own… |
+| [resume-after-crash](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/resume-after-crash/SKILL.md) | 3 files | Recovers an agent's work after a host crash, WSL restart, Windows update reboot or lost terminal. |
+| [sandboxed-agent](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/sandboxed-agent/SKILL.md) | 4 files | Creates a sandboxed coding agent for one folder, using a bubblewrap sandbox profile inferred from the folder… |
+| [thought-patterns](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/thought-patterns/SKILL.md) | 7 files | Applies structured cognitive thinking patterns to a hard problem, selecting and chaining from foundational… |
 | [token-lean-document-reading](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/token-lean-document-reading/SKILL.md) | 2 files | Reads PDFs, email files (.eml and .msg), Word documents, zip archives, large text files and scanned images… |
-| [transcript-analysis](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/transcript-analysis/SKILL.md) | none | Inventory and aggregate coding-agent session transcripts across Claude Code, OMP, Codex CLI and pi, with… |
+| [transcript-analysis](https://github.com/markpitt/claude-skills-ai-engineering/blob/main/skills/transcript-analysis/SKILL.md) | none | Inventories and aggregates coding-agent session transcripts across Claude Code, OMP, Codex CLI and pi, with… |
 
 ### [Developer environment](https://github.com/markpitt/claude-skills-dev-environment#readme)
 
@@ -125,20 +125,20 @@ SKILL.md with no resources at all.
 
 | Skill | Bundled files | What it does |
 |---|---|---|
-| [atomic-commit-organiser](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/atomic-commit-organiser/SKILL.md) | 3 files | Turn a dirty working tree, or several repositories at once, into commits grouped by intent, staging explicit… |
-| [cloudflare-workers-static-site](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/cloudflare-workers-static-site/SKILL.md) | none | Deploy a static site (Astro, Vite, Hugo, Eleventy, plain HTML) from a GitHub repo to Cloudflare Workers… |
-| [container-image-updates](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/container-image-updates/SKILL.md) | none | Check a Docker Compose stack's images for newer releases without pulling them, read the release notes for… |
-| [devcontainers](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/devcontainers/SKILL.md) | 5 files | Provides expert guidance on Development Containers (devcontainers), creating, configuring, and optimising… |
-| [git-protection](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/git-protection/SKILL.md) | none | Stop force pushes and history rewrites from a machine with a global git pre-push hook, and set the matching… |
-| [internal-ca-trust](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/internal-ca-trust/SKILL.md) | none | Make containers, language runtimes and headless browsers trust a private certificate authority (step-ca or… |
-| [markdown-formatter](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/markdown-formatter/SKILL.md) | 8 files | Formats markdown files according to best practices and common style guidelines. |
-| [markdown-to-pdf](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/markdown-to-pdf/SKILL.md) | 3 files | Produces high-quality PDF documents from Markdown using reproducible, automation-friendly workflows. |
-| [mise](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/mise/SKILL.md) | 7 files | Provides expert guidance on mise (mise-en-place), a polyglot dev tool and environment orchestrator that… |
-| [public-repo-hygiene](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/public-repo-hygiene/SKILL.md) | none | Make a private working repository safe to publish. |
-| [tmux-persist](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/tmux-persist/SKILL.md) | none | Keep tmux sessions across reboots on any Linux machine. |
-| [traefik-lan-routes](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/traefik-lan-routes/SKILL.md) | none | Publish a self-hosted service on the local network through Traefik v3, reachable only from LAN addresses… |
-| [wsl-host-ops](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/wsl-host-ops/SKILL.md) | none | Operate a WSL2 distribution from both sides of the boundary. |
-| [zellij](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/zellij/SKILL.md) | 1 file | Configure and operate zellij terminal multiplexer sessions. |
+| [atomic-commit-organiser](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/atomic-commit-organiser/SKILL.md) | 3 files | Turns a dirty working tree, or several repositories at once, into commits grouped by intent, staging explicit… |
+| [cloudflare-workers-static-site](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/cloudflare-workers-static-site/SKILL.md) | none | Deploys a static site (Astro, Vite, Hugo, Eleventy, plain HTML) from a GitHub repo to Cloudflare Workers… |
+| [container-image-updates](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/container-image-updates/SKILL.md) | none | Checks a Docker Compose stack's images for newer releases without pulling them, reads the release notes for… |
+| [devcontainers](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/devcontainers/SKILL.md) | 5 files | Writes, fixes and speeds up development containers under the Dev Container Specification. |
+| [git-protection](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/git-protection/SKILL.md) | none | Stops force pushes and history rewrites from a machine with a global git pre-push hook, and sets the matching… |
+| [internal-ca-trust](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/internal-ca-trust/SKILL.md) | none | Makes containers, language runtimes and headless browsers trust a private certificate authority (step-ca or… |
+| [markdown-formatter](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/markdown-formatter/SKILL.md) | 8 files | Formats Markdown files to a consistent house style - ATX headings with no skipped levels, one list marker… |
+| [markdown-to-pdf](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/markdown-to-pdf/SKILL.md) | 3 files | Converts Markdown to PDF with Pandoc in a way that can be repeated locally and in CI - explicit formats, a… |
+| [mise](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/mise/SKILL.md) | 7 files | Configures and debugs mise (mise-en-place), which manages tool versions, environment variables and project… |
+| [public-repo-hygiene](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/public-repo-hygiene/SKILL.md) | none | Makes a private working repository safe to publish. |
+| [tmux-persist](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/tmux-persist/SKILL.md) | none | Keeps tmux sessions across reboots on any Linux machine. |
+| [traefik-lan-routes](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/traefik-lan-routes/SKILL.md) | none | Publishes a self-hosted service on the local network through Traefik v3, reachable only from LAN addresses… |
+| [wsl-host-ops](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/wsl-host-ops/SKILL.md) | none | Operates a WSL2 distribution from both sides of the boundary. |
+| [zellij](https://github.com/markpitt/claude-skills-dev-environment/blob/main/skills/zellij/SKILL.md) | 1 file | Configures and operates zellij terminal multiplexer sessions. |
 
 ### [GCSE tutors](https://github.com/markpitt/claude-skills-gcse-tutors#readme)
 
@@ -146,15 +146,15 @@ SKILL.md with no resources at all.
 
 | Skill | Bundled files | What it does |
 |---|---|---|
-| [gcse-art-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-art-tutor/SKILL.md) | 4 files | GCSE Art and Design (Fine Art) tutor and revision assistant for 15–16 year old students preparing for 2026… |
-| [gcse-biology-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-biology-tutor/SKILL.md) | 4 files | GCSE Biology tutor and revision assistant for 15–16 year old students preparing for 2026 exams across AQA… |
-| [gcse-chemistry-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-chemistry-tutor/SKILL.md) | 4 files | GCSE Chemistry tutor and revision assistant for 15–16 year old students preparing for 2026 exams across AQA… |
-| [gcse-english-language-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-english-language-tutor/SKILL.md) | 4 files | GCSE English Language tutor and revision assistant for 15–16 year old students preparing for 2026 exams… |
-| [gcse-english-literature-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-english-literature-tutor/SKILL.md) | 4 files | GCSE English Literature tutor and revision assistant for 15–16 year old students preparing for 2026 exams… |
-| [gcse-history-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-history-tutor/SKILL.md) | 4 files | GCSE History tutor and revision assistant for 15–16 year old students preparing for 2026 exams across AQA… |
-| [gcse-maths-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-maths-tutor/SKILL.md) | 3 files | GCSE Maths tutor and revision assistant for 15–16 year old students preparing for 2026 exams across AQA… |
-| [gcse-pe-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-pe-tutor/SKILL.md) | 4 files | GCSE Physical Education tutor and revision assistant for 15–16 year old students preparing for 2026 exams… |
-| [gcse-physics-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-physics-tutor/SKILL.md) | 4 files | GCSE Physics tutor and revision assistant for 15–16 year old students preparing for 2026 exams across AQA… |
+| [gcse-art-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-art-tutor/SKILL.md) | 4 files | GCSE Art and Design (Fine Art) tutor and revision assistant for 15 to 16 year old students preparing for… |
+| [gcse-biology-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-biology-tutor/SKILL.md) | 4 files | GCSE Biology tutor and revision assistant for 15 to 16 year old students preparing for their exams across… |
+| [gcse-chemistry-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-chemistry-tutor/SKILL.md) | 4 files | GCSE Chemistry tutor and revision assistant for 15 to 16 year old students preparing for their exams across… |
+| [gcse-english-language-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-english-language-tutor/SKILL.md) | 4 files | GCSE English Language tutor and revision assistant for 15 to 16 year old students preparing for their exams… |
+| [gcse-english-literature-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-english-literature-tutor/SKILL.md) | 4 files | GCSE English Literature tutor and revision assistant for 15 to 16 year old students preparing for their exams… |
+| [gcse-history-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-history-tutor/SKILL.md) | 4 files | GCSE History tutor and revision assistant for 15 to 16 year old students preparing for their exams across… |
+| [gcse-maths-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-maths-tutor/SKILL.md) | 3 files | GCSE Maths tutor and revision assistant for 15 to 16 year old students preparing for their exams across AQA… |
+| [gcse-pe-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-pe-tutor/SKILL.md) | 4 files | GCSE Physical Education tutor and revision assistant for 15 to 16 year old students preparing for their exams… |
+| [gcse-physics-tutor](https://github.com/markpitt/claude-skills-gcse-tutors/blob/main/skills/gcse-physics-tutor/SKILL.md) | 4 files | GCSE Physics tutor and revision assistant for 15 to 16 year old students preparing for their exams across… |
 
 70 skills in 7 groups.
 <!-- END GENERATED SKILL INDEX -->
