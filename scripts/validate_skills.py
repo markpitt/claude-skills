@@ -99,6 +99,7 @@ def find_resource_refs(text: str) -> tuple[set[str], set[str]]:
 
 
 KEBAB = re.compile(r"^[a-z][a-z0-9-]*$")
+SEMVER = re.compile(r"\d+\.\d+\.\d+")
 FIRST_PERSON = re.compile(r"\b(I|we|our|my)\b", re.IGNORECASE)
 
 # House conventions, not Anthropic requirements. Neither phrasing is mandated
@@ -203,6 +204,13 @@ def validate_file(path: Path) -> list[Finding]:
             warn("description has no 'Do NOT use for' exclusion")
         if FIRST_PERSON.search(description):
             warn("description uses first person; prefer third person")
+
+    # Every version is full semver, so release notes, catalogues and zips can compare them
+    # without guessing what "2.0" means (Mark, 26/11/2026).
+    metadata = meta.get("metadata")
+    version = metadata.get("version") if isinstance(metadata, dict) else None
+    if version is not None and not SEMVER.fullmatch(str(version)):
+        err(f"metadata.version {version!r} is not major.minor.patch, e.g. \"1.0.0\"")
 
     line_count = len(text.splitlines())
     if line_count > MAX_LINES:
