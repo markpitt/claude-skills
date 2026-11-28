@@ -26,6 +26,9 @@ const REPO_URL = `https://github.com/${REPO}`;
 // `latest` resolves at click time, so the site never pins a stale tag.
 const DOWNLOAD_BASE = `${REPO_URL}/releases/latest/download`;
 const SITE_HOME = 'https://markpitt.dev';
+// Where GitHub Pages serves this site. Only the 404 page needs it: that one page is served at any
+// depth, so its links cannot be relative.
+const SITE_BASE = '/claude-skills/';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const LOCAL_SKILLS_DIR = path.join(REPO_ROOT, 'skills');
@@ -563,9 +566,10 @@ const SITE_NAV = [
     ['contact', 'Contact'],
 ];
 
-/** The page frame every page shares. `depth` is how far below docs/ the page sits. */
-function layout({ title, description, depth = 0, current = '', body }) {
-    const up = '../'.repeat(depth);
+/** The page frame every page shares. `depth` is how far below docs/ the page sits; `root`, when
+ * given, replaces the relative prefix with an absolute one. `head` adds to the <head>. */
+function layout({ title, description, depth = 0, current = '', body, root, head = '' }) {
+    const up = root ?? '../'.repeat(depth);
     const navLink = (href, label, key) =>
         `<a href="${up}${href}"${current === key ? ' aria-current="page"' : ''}>${label}</a>`;
     return `<!DOCTYPE html>
@@ -579,7 +583,7 @@ ${description ? `<meta name="description" content="${esc(description)}">` : ''}
 <link rel="stylesheet" href="${up}fonts.css">
 <link rel="stylesheet" href="${up}tokens.css">
 <link rel="stylesheet" href="${up}style.css">
-${THEME_SCRIPT}
+${head}${THEME_SCRIPT}
 </head>
 <body class="cs-site">
 <a class="skip" href="#main">Skip to the content</a>
@@ -935,6 +939,54 @@ cp -r ${esc((groups[0]?.public_repo || REPO).split('/')[1])}/skills/skill-name ~
     return layout({ title: 'Install a skill · claude-skills', description: 'How to install a Claude Skill in Claude Code or Claude Desktop.', current: 'install', body });
 }
 
+/** The "page not found" page: markpitt.dev's 404 page (markpitt.github.io src/pages/404.astro)
+ * in this site's frame. GitHub Pages serves docs/404.html, with a 404 status, at every address
+ * under /claude-skills/ that has nothing behind it. site/not-found.css is a verbatim copy of the
+ * main site's stylesheet and site/not-found.js its script as plain JavaScript: change them there
+ * first. Without the script the page is still whole: only the address and the closest match need it. */
+function generateNotFoundPage(skills) {
+    const page = (rel) => `${SITE_BASE}${rel}`;
+    // Keys are addresses as someone might type them; the script lower-cases and strips .html.
+    const routes = [
+        { key: SITE_BASE, href: page('index.html'), label: 'claude-skills' },
+        { key: page('getting-started/'), href: page('getting-started.html'), label: 'Install a skill' },
+        { key: page('skills/'), href: page('index.html#skills'), label: 'All skills' },
+        ...skills.map((s) => ({ key: page(`skills/${s.path.toLowerCase()}/`), href: page(`skills/${encodeURI(s.path)}.html`), label: s.name })),
+    ];
+    const ways = [
+        [page('index.html'), 'claude-skills', 'The index: every skill, grouped by topic.'],
+        [page('index.html#skills'), 'All skills', 'One list, with a filter.'],
+        [page('getting-started.html'), 'Install', 'How to add a skill to Claude Code or Claude Desktop.'],
+        ['/', 'markpitt.dev', 'The rest of my site: background, projects and contact.'],
+    ];
+    const body = `
+  <div class="nf" data-nf data-nf-root="${SITE_BASE}" data-nf-routes="${esc(JSON.stringify(routes))}">
+    <div class="nf-inner">
+      <p class="nf-code" aria-hidden="true">4<span class="nf-zero"><svg viewBox="0 0 460 460" focusable="false"><clipPath id="nf-crop"><circle cx="230" cy="230" r="230"></circle></clipPath><g clip-path="url(#nf-crop)"><rect class="nf-disc" width="460" height="460"></rect><circle class="nf-pupil" cx="230" cy="230" r="145"></circle></g></svg></span>4</p>
+      <h1 class="nf-title">Page not found</h1>
+      <p class="nf-lede">There's nothing at <span data-nf-where>this address</span>. Either the link is out of date or the address has a typo in it, and from here I can't tell which.</p>
+      <div class="nf-term" data-nf-term hidden>
+        <p class="nf-cmd"><span class="nf-prompt" aria-hidden="true">$</span>curl -sI https://markpitt.dev<span data-nf-term-path></span></p>
+        <p><span class="nf-status">HTTP/2 404</span></p>
+      </div>
+      <p class="nf-suggest" data-nf-suggest hidden>Closest match I have: <a data-nf-suggest-link href="${page('index.html')}">${SITE_BASE}</a> (<span data-nf-suggest-label>claude-skills</span>)</p>
+      <h2 class="nf-routes-title">Try one of these</h2>
+      <ul class="nf-routes">
+        ${ways.map(([href, label, desc]) => `<li class="nf-route"><a href="${href}">${label}</a><span class="nf-route-path">${href}</span><span class="nf-route-desc">${esc(desc)}</span></li>`).join('\n        ')}
+      </ul>
+      <p class="nf-report">If a link on this site sent you here, that's my bug, not yours. <a data-nf-report href="mailto:mark@markpitt.dev?subject=Broken%20link%20on%20markpitt.dev">Email me the address</a> and I'll fix it.</p>
+    </div>
+  </div>
+<script type="module" src="${page('not-found.js')}"></script>`;
+    return layout({
+        title: 'Page not found · claude-skills',
+        description: 'There is nothing at this address on the claude-skills site.',
+        root: SITE_BASE,
+        head: `<meta name="robots" content="noindex">\n<link rel="stylesheet" href="${page('not-found.css')}">\n`,
+        body,
+    });
+}
+
 function build() {
     console.log('Building the claude-skills Pages site...\n');
     const groups = loadGroups();
@@ -965,11 +1017,13 @@ function build() {
     console.log(`✓ Generated ${filePages} pages for the skills' bundled files`);
     fs.writeFileSync(path.join(DOCS_DIR, 'getting-started.html'), generateGettingStartedPage(groups));
     console.log('✓ Generated getting-started.html');
+    fs.writeFileSync(path.join(DOCS_DIR, '404.html'), generateNotFoundPage(skills));
+    console.log('✓ Generated 404.html');
 
-    for (const file of ['style.css', 'tokens.css', 'fonts.css']) fs.copyFileSync(path.join(SITE_SRC, file), path.join(DOCS_DIR, file));
+    for (const file of ['style.css', 'tokens.css', 'fonts.css', 'not-found.css', 'not-found.js']) fs.copyFileSync(path.join(SITE_SRC, file), path.join(DOCS_DIR, file));
     fs.cpSync(path.join(SITE_SRC, 'fonts'), path.join(DOCS_DIR, 'fonts'), { recursive: true });
     fs.copyFileSync(path.join(SITE_SRC, 'assets', 'mark.svg'), path.join(DOCS_DIR, 'favicon.svg'));
-    console.log('✓ Copied style.css, tokens.css, fonts.css, fonts/ and favicon.svg');
+    console.log('✓ Copied style.css, tokens.css, fonts.css, not-found.css, not-found.js, fonts/ and favicon.svg');
 
     // Prevent GitHub Pages from running Jekyll on the static output
     fs.writeFileSync(path.join(DOCS_DIR, '.nojekyll'), '');

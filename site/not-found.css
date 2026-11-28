@@ -1,0 +1,211 @@
+/* markpitt.dev "page not found" page (404.html).
+   The design source is personal-brand designs/styles/not-found.css. markpitt.dev ships it verbatim
+   as src/styles/not-found.css, and its project sites (Claude Overview, claude-skills) carry the
+   same copy for their own 404 pages: change them all together. Tokens only, every rule scoped to .nf, so it can sit beside the site's Tailwind build
+   and the chrome kit without touching either. GitHub Pages serves this one page at every address
+   that has nothing else, so nothing here may depend on the page's own URL. */
+
+.nf {
+  padding: var(--space-16) 24px var(--space-24);
+  color: var(--ink);
+}
+.nf-inner {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+/* The numerals. The zero is the brand mark, sized to Inter's cap height so it sits on the
+   baseline with the fours. Decorative: the h1 carries the meaning. */
+.nf-code {
+  margin: 0 0 var(--space-6);
+  font: 700 clamp(104px, 24vw, 184px) / 1 var(--font-sans);
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  white-space: nowrap;
+  user-select: none;
+}
+.nf-zero {
+  display: inline-block;
+  width: 0.73em;
+  height: 0.73em;
+  margin: 0 0.035em 0 0.02em;
+  vertical-align: baseline;
+}
+.nf-zero svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.nf-disc {
+  fill: var(--accent-mark);
+}
+.nf-pupil {
+  fill: var(--charcoal);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* The mark looks left, then right, then settles: twice, then never again. Off entirely for
+   anyone who asks for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .nf-pupil {
+    animation: nf-look 2.6s ease-in-out 0.5s 2 both;
+  }
+}
+@keyframes nf-look {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  22%,
+  38% {
+    transform: translate(-19%, 4%);
+  }
+  62%,
+  78% {
+    transform: translate(19%, 4%);
+  }
+}
+
+.nf-title {
+  margin: 0 0 var(--space-4);
+  font: var(--type-h1);
+  letter-spacing: var(--type-h1-tracking);
+  color: var(--ink);
+}
+.nf-lede {
+  max-width: 38rem;
+  margin: 0 0 var(--space-6);
+  font: var(--type-body);
+  color: var(--muted);
+}
+.nf-path {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--ink);
+  background: var(--surface-pill);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+
+/* What the server said, as a terminal would show it. */
+.nf-term {
+  margin: 0 0 var(--space-8);
+  padding: var(--space-3) var(--space-4);
+  max-width: 38rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font: 400 14px / 1.7 var(--font-mono);
+  color: var(--muted);
+}
+.nf-term p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.nf-term .nf-cmd {
+  color: var(--ink);
+}
+.nf-prompt {
+  color: var(--accent-text);
+  margin-right: 0.6ch;
+}
+.nf-status {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* "Closest match": shown only when the script finds one. */
+.nf-suggest {
+  margin: 0 0 var(--space-12);
+  padding: var(--space-4) var(--space-6);
+  max-width: 38rem;
+  border-left: 3px solid var(--accent-mark);
+  background: var(--surface-card);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font: var(--type-body);
+}
+.nf-suggest[hidden] {
+  display: none;
+}
+.nf-suggest a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent-text);
+  overflow-wrap: anywhere;
+}
+
+.nf-routes-title {
+  margin: 0 0 var(--space-4);
+  font: 600 12px / 1.4 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.nf-routes {
+  list-style: none;
+  margin: 0 0 var(--space-12);
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+@media (min-width: 560px) {
+  .nf-routes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.nf-route {
+  position: relative;
+  padding: var(--space-4) var(--space-6);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: border-color 150ms;
+}
+.nf-route:hover {
+  border-color: var(--border-control);
+}
+.nf-route a {
+  font: 600 17px / 1.4 var(--font-sans);
+  color: var(--ink);
+  text-decoration: none;
+}
+/* The whole card is the link's hit area; the link text stays just the label. */
+.nf-route a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.nf-route:hover a {
+  color: var(--accent-text);
+}
+.nf-route-path {
+  display: block;
+  margin: 2px 0 var(--space-2);
+  font: 400 13px / 1.4 var(--font-mono);
+  color: var(--muted);
+}
+.nf-route-desc {
+  display: block;
+  font: var(--type-small);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.nf-report {
+  max-width: 38rem;
+  margin: 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+  font: var(--type-ui);
+  color: var(--muted);
+}
+.nf-report a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

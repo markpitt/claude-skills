@@ -210,6 +210,17 @@
 .cs-site .foot-bar a { color: var(--muted); text-decoration: none; }
 .cs-site .foot-bar a:hover { color: var(--ink); text-decoration: underline; }
 
+/* The 404 page (not-found.css, a verbatim copy of the main site's). This file's element resets
+ * above (.cs-site h1, p, ul and so on) outrank that sheet's single classes, so the margins and the
+ * eyebrow heading it sets are restated here at this file's weight. */
+.cs-site .nf-code { margin-bottom: var(--space-6); }
+.cs-site .nf-title { margin-bottom: var(--space-4); }
+.cs-site .nf-lede { margin-bottom: var(--space-6); }
+.cs-site .nf-term { margin-bottom: var(--space-8); }
+.cs-site .nf-suggest { margin-bottom: var(--space-12); }
+.cs-site .nf-routes-title { margin-bottom: var(--space-4); font: 600 12px / 1.4 var(--font-mono); }
+.cs-site .nf-routes { margin-bottom: var(--space-12); }
+
 @media (max-width: 760px) {
   .cs-site .cs-intro { padding: var(--space-12) 0 var(--space-8); }
   .cs-site h1 { font-size: 32px; }
